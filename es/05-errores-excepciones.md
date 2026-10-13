@@ -176,7 +176,7 @@ leyendo 5 s
 
 - **`try { ... }`** contiene la línea que puede fallar, y de preferencia **solo esa** y las que dependen de ella. Si no hay error, el programa sigue hasta el final del bloque. Si lo hay, Java abandona el `try` en esa misma línea y salta al `catch` que corresponda.
 - **`catch (NumberFormatException e) { ... }`** se ejecuta si el error fue de ese tipo. El `e` es la excepción atrapada: `e.getMessage()` da su mensaje. Cualquier otro tipo de excepción pasaría de largo.
-- **`finally { ... }`** se ejecuta **siempre**: haya habido error o no, y aunque el `try` o el `catch` hayan hecho `return`. Mira la salida: con «5000», se imprime «convertí 5000», luego el `finally`, y **después** llega el resultado a quien llamó, aunque el `return valor` aparece antes en el código. Se usa para limpiar. La [documentación de Oracle](https://docs.oracle.com/javase/tutorial/essential/exceptions/finally.html) lo resume: «el bloque `finally` siempre se ejecuta cuando el `try` termina».
+- **`finally { ... }`** se ejecuta al salir del `try`, como sea que se salga: haya habido error o no, y aunque el `try` o el `catch` hayan hecho `return`. La única excepción es que la JVM termine de golpe mientras está dentro del `try` o del `catch`: una llamada a `System.exit` (que la lección 10 explica), una caída del proceso o un apagado forzado. Mira la salida: con «5000», se imprime «convertí 5000», luego el `finally`, y **después** llega el resultado a quien llamó, aunque el `return valor` aparece antes en el código. Se usa para limpiar. La [documentación de Oracle](https://docs.oracle.com/javase/tutorial/essential/exceptions/finally.html) lo resume: «el bloque `finally` siempre se ejecuta cuando el `try` termina», y la misma página anota esa excepción.
 
 Una nota de forma: devolver `-1` para decir «no válido» es un mal hábito, porque es un valor mágico (nada impide que alguien lo use como si fuera un tiempo de verdad). Aquí está solo porque el ejemplo es mínimo; en la sección 5.3 el `catch` hará algo mejor.
 
@@ -212,7 +212,7 @@ error: compilation failed
 
 `exception NumberFormatException has already been caught`: «ya fue atrapada». El primer `catch (Exception e)` se come todo, incluida la `NumberFormatException`, y el segundo bloque sería código muerto. La regla: **de lo particular a lo general**, igual que cuando el `switch` de la lección 3 pedía ordenar los casos.
 
-#### 5.1.4 Por qué una verificada no cruza una lambda
+#### 5.1.4 Por qué una verificada no cruza la lambda de un `map`
 
 Hay un lugar donde la regla de las verificadas se siente como un estorbo, y conviene conocerlo ahora porque te toparás con él en el `revisor`. Es dentro de una lambda. Este programa intenta esperar un poco dentro de un `map`:
 
@@ -241,7 +241,7 @@ fig05_05.java:8: error: unreported exception InterruptedException; must be caugh
 error: compilation failed
 ```
 
-El mismo error de antes, pero ahora dentro de la lambda: `Thread.sleep` lanza `InterruptedException` (verificada) y la lambda del `map` no la declara ni la atrapa. La razón es que `map` espera una `Function`, la interfaz funcional de la lección 4, y el método `apply` de una `Function` **no declara ninguna excepción verificada** en su firma. Una lambda no puede lanzar más de lo que su interfaz declara. Las salidas son tres, y ninguna es agradable: atrapar la excepción dentro de la lambda (el cuerpo se llena de `try`), envolverla en una no verificada (se pierde la ventaja de la verificada), o **no usar un *stream* ahí y volver a un bucle `for`**, donde el método que lo contiene sí puede declarar el `throws`. En el proyecto de hoy tomaremos esta última: `revisarTodos` pasa de *stream* a `for`. No es un retroceso, es elegir la herramienta que permite lo que el problema pide.
+El mismo error de antes, pero ahora dentro de la lambda: `Thread.sleep` lanza `InterruptedException` (verificada) y la lambda del `map` no la declara ni la atrapa. La razón es que `map` espera una `Function`, la interfaz funcional de la lección 4, y el método `apply` de una `Function` **no declara ninguna excepción verificada** en su firma. Una lambda no puede lanzar más de lo que su interfaz declara. (Con otras interfaces sí puede: el método `call` de `Callable` declara `throws Exception`, y en la lección 9 lo vas a aprovechar.) Las salidas son tres, y ninguna es agradable: atrapar la excepción dentro de la lambda (el cuerpo se llena de `try`), envolverla en una no verificada (se pierde la ventaja de la verificada), o **no usar un *stream* ahí y volver a un bucle `for`**, donde el método que lo contiene sí puede declarar el `throws`. En el proyecto de hoy tomaremos esta última: `revisarTodos` pasa de *stream* a `for`. No es un retroceso, es elegir la herramienta que permite lo que el problema pide.
 
 Si prefieres una referencia a método (`.map(Revision::revisar)`) el mensaje cambia pero la causa es la misma: `incompatible thrown types InterruptedException in functional expression`. El ejercicio 4 te pide provocarlo.
 
@@ -899,7 +899,7 @@ final class Configuracion {
 
 **`verificarRepetidos`** usa el truco de la sección 4.1.2: `vistos.add(nombre)` devuelve `false` si el nombre ya estaba, y esos nombres se juntan en un `LinkedHashSet` (que conserva el orden en que se encontraron) y `String.join(", ", repetidos)`, que une los elementos con un separador, los lista todos en el mensaje: `nombres repetidos: catalogo`. Un detalle sobre qué hace este método: **el programa se detiene en el primer error**, y no junta todos los errores del archivo para decirlos de una vez. Es más simple, y suficiente para un archivo de cuatro renglones.
 
-Ahora `Revision`, que cambia de dos maneras. Primero, `revisar` espera el tiempo de la respuesta con `Thread.sleep(tiempo.getAsLong())` si lo hay (el `OptionalLong` de la lección 4), y por eso declara `throws InterruptedException`. Segundo, `revisarTodos` es un `for` que llena una lista, porque la lambda de un *stream* no puede lanzar la excepción verificada, como se vio en la sección 5.1.4:
+Ahora `Revision`, que cambia de dos maneras. Primero, `revisar` espera el tiempo de la respuesta con `Thread.sleep(tiempo.getAsLong())` si lo hay (el `OptionalLong` de la lección 4), y por eso declara `throws InterruptedException`. Segundo, `revisarTodos` es un `for` que llena una lista, porque la lambda de un `map` no puede lanzar la excepción verificada (su `Function` no la declara), como se vio en la sección 5.1.4:
 
 ```java
 // fig05_11/Revision.java

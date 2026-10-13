@@ -282,7 +282,7 @@ There are two holes. The first: `etapas[0] = "CAMBIADO DESDE FUERA"` (“CHANGED
 
 The last line has another surprise. Two `Ruta`s created with arrays of equal content are **not equal** according to `equals`. The *record*'s `equals` compares component by component, and to compare the arrays it uses the arrays' `equals`, which asks about identity, like `==`. It is the same problem as in 2.2.2, again.
 
-The practical lesson: **a *record* is only as immutable as its components.** With texts, numbers, `enum`s and other immutable *records* there is no problem. With an array, or with any object that can be modified, immutability is an illusion. In Lesson 4 you will see the usual solution: storing an **unmodifiable copy** of the list in the compact constructor (`List.copyOf`), and the door will be closed.
+The practical lesson: **a *record* is only as immutable as its components.** With texts, numbers, `enum`s and other immutable *records* there is no problem. With an array, or with any object that can be modified, immutability is an illusion. In Lesson 4 you will see the usual solution for lists: storing an **unmodifiable copy** in the compact constructor (`List.copyOf`). Mind what it closes and what it does not: nobody will be able to add, remove or change elements **of the list**, but `List.copyOf` does not copy the elements or make them immutable. It is enough when the elements are already immutable, such as texts or *records* with immutable components (the case of the `revisor`); if they were modifiable objects, you would have to copy each element too or design them to be immutable.
 
 ### 3.2 Enums
 

@@ -282,7 +282,7 @@ Há dois buracos. O primeiro: `etapas[0] = "CAMBIADO DESDE FUERA"` modifica o ar
 
 A última linha tem outra surpresa. Duas `Ruta` criadas com arrays de igual conteúdo **não são iguais** segundo `equals`. O `equals` do *record* compara componente por componente, e para comparar os arrays usa o `equals` dos arrays, que pergunta por identidade, como o `==`. É o mesmo problema de 2.2.2, outra vez.
 
-A lição prática: **um *record* é tão imutável quanto seus componentes.** Com textos, números, `enum`s e outros *records* imutáveis não há problema. Com um array, ou com qualquer objeto que possa ser modificado, a imutabilidade é uma ilusão. Na Lição 4 você verá a solução habitual: guardar uma **cópia não modificável** da lista no construtor compacto (`List.copyOf`), e a porta ficará fechada.
+A lição prática: **um *record* é tão imutável quanto seus componentes.** Com textos, números, `enum`s e outros *records* imutáveis não há problema. Com um array, ou com qualquer objeto que possa ser modificado, a imutabilidade é uma ilusão. Na Lição 4 você verá a solução habitual para as listas: guardar uma **cópia não modificável** no construtor compacto (`List.copyOf`). Atenção ao que ela fecha e ao que não fecha: ninguém poderá adicionar, remover nem alterar elementos **da lista**, mas `List.copyOf` não copia os elementos nem os torna imutáveis. Basta quando os elementos já são imutáveis, como textos ou *records* de componentes imutáveis (o caso do `revisor`); se fossem objetos modificáveis, seria preciso copiar também cada elemento ou projetá-los como imutáveis.
 
 ### 3.2 Enums
 

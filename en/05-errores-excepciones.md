@@ -176,7 +176,7 @@ leyendo 5 s
 
 - **`try { ... }`** contains the line that can fail, and preferably **only that one** and the ones that depend on it. If there is no error, the program continues to the end of the block. If there is, Java abandons the `try` at that very line and jumps to the corresponding `catch`.
 - **`catch (NumberFormatException e) { ... }`** runs if the error was of that type. The `e` is the caught exception: `e.getMessage()` gives its message. Any other type of exception would pass by.
-- **`finally { ... }`** runs **always**: whether there was an error or not, and even if the `try` or the `catch` did a `return`. Look at the output: with “5000”, “convertí 5000” is printed, then the `finally`, and **afterward** the result reaches the caller, although the `return valor` appears earlier in the code. It is used to clean up. [Oracle's documentation](https://docs.oracle.com/javase/tutorial/essential/exceptions/finally.html) summarizes it: “the `finally` block always executes when the `try` block exits”.
+- **`finally { ... }`** runs when leaving the `try`, however it is left: whether there was an error or not, and even if the `try` or the `catch` did a `return`. The only exception is the JVM terminating abruptly while inside the `try` or the `catch`: a call to `System.exit` (which lesson 10 explains), a process crash or a forced shutdown. Look at the output: with “5000”, “convertí 5000” is printed, then the `finally`, and **afterward** the result reaches the caller, although the `return valor` appears earlier in the code. It is used to clean up. [Oracle's documentation](https://docs.oracle.com/javase/tutorial/essential/exceptions/finally.html) summarizes it: “the `finally` block always executes when the `try` block exits”, and the same page notes that exception.
 
 A note on form: returning `-1` to say “not valid” is a bad habit, because it is a magic value (nothing prevents someone from using it as if it were a real time). It is here only because the example is minimal; in section 5.3 the `catch` will do something better.
 
@@ -212,7 +212,7 @@ error: compilation failed
 
 `exception NumberFormatException has already been caught`. The first `catch (Exception e)` swallows everything, including the `NumberFormatException`, and the second block would be dead code. The rule: **from the particular to the general**, just as when the `switch` of lesson 3 asked to order the cases.
 
-#### 5.1.4 Why a checked exception does not cross a lambda
+#### 5.1.4 Why a checked exception does not cross the lambda of a `map`
 
 There is a place where the rule of checked exceptions feels like a nuisance, and it is worth knowing now because you will run into it in the `revisor`. It is inside a lambda. This program tries to wait a little inside a `map`:
 
@@ -241,7 +241,7 @@ fig05_05.java:8: error: unreported exception InterruptedException; must be caugh
 error: compilation failed
 ```
 
-The same error as before, but now inside the lambda: `Thread.sleep` throws `InterruptedException` (checked) and the `map` lambda neither declares nor catches it. The reason is that `map` expects a `Function`, the functional interface from lesson 4, and the `apply` method of a `Function` **declares no checked exception** in its signature. A lambda cannot throw more than its interface declares. The ways out are three, and none is pleasant: catch the exception inside the lambda (the body fills up with `try`), wrap it in an unchecked one (the advantage of the checked one is lost), or **not use a *stream* there and go back to a `for` loop**, where the method that contains it can declare the `throws`. In today's project we will take the last: `revisarTodos` goes from *stream* to `for`. It is not a step backward, it is choosing the tool that allows what the problem asks.
+The same error as before, but now inside the lambda: `Thread.sleep` throws `InterruptedException` (checked) and the `map` lambda neither declares nor catches it. The reason is that `map` expects a `Function`, the functional interface from lesson 4, and the `apply` method of a `Function` **declares no checked exception** in its signature. A lambda cannot throw more than its interface declares. (With other interfaces it can: the `call` method of `Callable` declares `throws Exception`, and in lesson 9 you will take advantage of that.) The ways out are three, and none is pleasant: catch the exception inside the lambda (the body fills up with `try`), wrap it in an unchecked one (the advantage of the checked one is lost), or **not use a *stream* there and go back to a `for` loop**, where the method that contains it can declare the `throws`. In today's project we will take the last: `revisarTodos` goes from *stream* to `for`. It is not a step backward, it is choosing the tool that allows what the problem asks.
 
 If you prefer a method reference (`.map(Revision::revisar)`) the message changes but the cause is the same: `incompatible thrown types InterruptedException in functional expression`. Exercise 4 asks you to provoke it.
 
@@ -899,7 +899,7 @@ final class Configuracion {
 
 **`verificarRepetidos`** (“check repeats”) uses the trick from section 4.1.2: `vistos.add(nombre)` returns `false` if the name was already there, and those names are gathered in a `LinkedHashSet` (which keeps the order in which they were found) and `String.join(", ", repetidos)`, which joins the elements with a separator, lists them all in the message: `nombres repetidos: catalogo` (“repeated names: catalogo”). A detail about what this method does: **the program stops at the first error**, and does not gather all the file's errors to report them at once. It is simpler, and enough for a four-line file.
 
-Now `Revision`, which changes in two ways. First, `revisar` waits for the response's time with `Thread.sleep(tiempo.getAsLong())` if there is one (the `OptionalLong` from lesson 4), and so it declares `throws InterruptedException`. Second, `revisarTodos` is a `for` that fills a list, because the lambda of a *stream* cannot throw the checked exception, as was seen in section 5.1.4:
+Now `Revision`, which changes in two ways. First, `revisar` waits for the response's time with `Thread.sleep(tiempo.getAsLong())` if there is one (the `OptionalLong` from lesson 4), and so it declares `throws InterruptedException`. Second, `revisarTodos` is a `for` that fills a list, because the lambda of a `map` cannot throw the checked exception (its `Function` does not declare it), as was seen in section 5.1.4:
 
 ```java
 // fig05_11/Revision.java

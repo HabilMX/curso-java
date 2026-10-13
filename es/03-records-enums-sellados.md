@@ -282,7 +282,7 @@ Hay dos agujeros. El primero: `etapas[0] = "CAMBIADO DESDE FUERA"` modifica el a
 
 La última línea tiene otra sorpresa. Dos `Ruta` creadas con arreglos de igual contenido **no son iguales** según `equals`. El `equals` del *record* compara componente por componente, y para comparar los arreglos usa el `equals` de los arreglos, que pregunta por identidad, como `==`. Es el mismo problema de 2.2.2, otra vez.
 
-La lección práctica: **un *record* es tan inmutable como sus componentes.** Con textos, números, `enum`s y otros *records* inmutables no hay problema. Con un arreglo, o con cualquier objeto que se pueda modificar, la inmutabilidad es una ilusión. En la Lección 4 verás la solución habitual: guardar una **copia inmodificable** de la lista en el constructor compacto (`List.copyOf`), y quedará cerrada la puerta.
+La lección práctica: **un *record* es tan inmutable como sus componentes.** Con textos, números, `enum`s y otros *records* inmutables no hay problema. Con un arreglo, o con cualquier objeto que se pueda modificar, la inmutabilidad es una ilusión. En la Lección 4 verás la solución habitual para las listas: guardar una **copia inmodificable** en el constructor compacto (`List.copyOf`). Ojo con lo que cierra y lo que no: nadie podrá agregar, quitar ni cambiar elementos **de la lista**, pero `List.copyOf` no copia los elementos ni los vuelve inmutables. Basta cuando los elementos ya son inmutables, como textos o *records* de componentes inmutables (el caso del `revisor`); si fueran objetos modificables, habría que copiar también cada elemento o diseñarlos inmutables.
 
 ### 3.2 Enums
 

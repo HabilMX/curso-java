@@ -282,7 +282,7 @@ Il y a deux trous. Le premier : `etapas[0] = "CAMBIADO DESDE FUERA"` (« CHANGÉ
 
 La dernière ligne réserve une autre surprise. Deux `Ruta` créées avec des tableaux de même contenu **ne sont pas égales** selon `equals`. Le `equals` du *record* compare composant par composant, et pour comparer les tableaux il utilise le `equals` des tableaux, qui demande l'identité, comme `==`. C'est le même problème qu'en 2.2.2, une fois de plus.
 
-La leçon pratique : **un *record* est aussi immuable que ses composants.** Avec des textes, des nombres, des `enum`s et d'autres *records* immuables, il n'y a pas de problème. Avec un tableau, ou n'importe quel objet qui peut être modifié, l'immuabilité est une illusion. Dans la Leçon 4, tu verras la solution habituelle : garder une **copie non modifiable** de la liste dans le constructeur compact (`List.copyOf`), et la porte sera fermée.
+La leçon pratique : **un *record* est aussi immuable que ses composants.** Avec des textes, des nombres, des `enum`s et d'autres *records* immuables, il n'y a pas de problème. Avec un tableau, ou n'importe quel objet qui peut être modifié, l'immuabilité est une illusion. Dans la Leçon 4, tu verras la solution habituelle pour les listes : garder une **copie non modifiable** dans le constructeur compact (`List.copyOf`). Attention à ce qu'elle ferme et à ce qu'elle ne ferme pas : personne ne pourra ajouter, retirer ni changer d'éléments **de la liste**, mais `List.copyOf` ne copie pas les éléments et ne les rend pas immuables. Cela suffit quand les éléments sont déjà immuables, comme des textes ou des *records* aux composants immuables (le cas du `revisor`) ; s'ils étaient des objets modifiables, il faudrait aussi copier chaque élément ou les concevoir immuables.
 
 ### 3.2 Enums
 
