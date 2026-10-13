@@ -86,7 +86,7 @@ java fig03_01.java                  # compara lo que imprime con fig03_01.salida
 
 Cada programa es un archivo `figNN_NN.java` dentro de la carpeta de su lección, con su salida esperada al lado (`figNN_NN.salida.txt`). Los programas que a propósito no compilan traen `figNN_NN.error-esperado.txt`, con el error que la lección enseña a leer. Los de varios archivos traen los demás en la carpeta `figNN_NN/`. Los proyectos de Maven (desde la lección 6) son carpetas con su propio `pom.xml`: entra en la carpeta y corre `mvn -B verify`.
 
-**Las lecciones son la fuente; `programas/` es la copia ejecutable de sus bloques de código.** En cada cambio la verificación compila y ejecuta cada programa y compara su salida con la que la lección documenta, así que lo que lees y lo que ejecutas dicen lo mismo.
+**Las lecciones son la fuente; `programas/` es la copia ejecutable de sus bloques de código.** En cada cambio la verificación hace dos cosas: comprueba que cada bloque de código de una lección sea idéntico a su archivo de `programas/`, y compila y ejecuta ese archivo comparando su salida con la que la lección documenta. Así lo que lees y lo que ejecutas no pueden separarse.
 
 ## Qué hay en el repositorio
 
@@ -104,6 +104,7 @@ Dentro de `herramientas/`:
 | | |
 |---|---|
 | `verificar-programas.sh` | compila y ejecuta los programas de las lecciones con Java 25 y compara la salida real contra la documentada; salta la lección 8, que necesita el laboratorio encendido y las bibliotecas en el *classpath* |
+| `verificar-extractos.sh` | comprueba que cada bloque de código de las lecciones diga lo mismo que su archivo de `programas/`; con `--probar` siembra una diferencia y exige detectarla |
 | `verificar-plantilla.sh` | comprueba que cada lección tenga las partes de la plantilla, objetivos, ejercicios y fuentes en el número pedido |
 | `medir-profundidad.sh` | mide las palabras de explicación por lección |
 

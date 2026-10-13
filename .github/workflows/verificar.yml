@@ -43,6 +43,12 @@ jobs:
       - name: Las traducciones corresponden al español
         run: herramientas/verificar-traducciones.sh
 
+      - name: Comprobar que el comparador de extractos caza una diferencia sembrada
+        run: herramientas/verificar-extractos.sh --probar
+
+      - name: El código de las lecciones y el de programas/ dicen lo mismo
+        run: herramientas/verificar-extractos.sh
+
       - name: Compilar y ejecutar los programas de las lecciones
         run: herramientas/verificar-programas.sh
 
