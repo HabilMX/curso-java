@@ -1431,5 +1431,4 @@ Responda sem olhar a lição:
 
 ---
 
-**Anterior:** [Lição 9 — Concorrência: verificar tudo ao mesmo tempo](09-concurrencia.md) ·
-**Índice do curso:** [Curso de Java](README.md)
+**Anterior:** [Lição 9 — Concorrência: verificar tudo ao mesmo tempo](09-concurrencia.md)

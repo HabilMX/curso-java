@@ -1431,5 +1431,4 @@ Réponds sans regarder la leçon :
 
 ---
 
-**Précédente :** [Leçon 9 — Concurrence : tout vérifier en même temps](09-concurrencia.md) ·
-**Index du cours :** [Cours de Java](README.md)
+**Précédente :** [Leçon 9 — Concurrence : tout vérifier en même temps](09-concurrencia.md)

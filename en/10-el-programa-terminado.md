@@ -1431,5 +1431,4 @@ Answer without looking at the lesson:
 
 ---
 
-**Previous:** [Lesson 9 — Concurrency: checking everything at once](09-concurrencia.md) ·
-**Course index:** [Java course](README.md)
+**Previous:** [Lesson 9 — Concurrency: checking everything at once](09-concurrencia.md)
