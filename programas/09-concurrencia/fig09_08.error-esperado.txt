@@ -1,0 +1,6 @@
+fig09_08.java:7: error: StructuredTaskScope is a preview API and is disabled by default.
+  try (var alcance = StructuredTaskScope.open()) {
+                     ^
+  (use --enable-preview to enable preview APIs)
+1 error
+error: compilation failed

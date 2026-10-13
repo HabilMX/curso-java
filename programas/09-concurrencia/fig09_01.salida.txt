@@ -1,0 +1,2 @@
+de-plataforma: virtual=false, demonio=false
+virtual-1: virtual=true, demonio=true

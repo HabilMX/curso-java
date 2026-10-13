@@ -1,0 +1,2 @@
+cliente por omisión:      302
+cliente que las sigue:    200

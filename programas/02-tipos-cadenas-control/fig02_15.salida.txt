@@ -1,0 +1,5 @@
+correcto
+redirección
+error del cliente
+error del servidor
+sin clasificar

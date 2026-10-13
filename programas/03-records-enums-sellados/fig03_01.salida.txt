@@ -1,0 +1,7 @@
+Punto[nombre=catalogo, tiempoMs=142]
+nombre:     catalogo
+tiempoMs:   142
+a.equals(b): true
+a == b:      false
+a.equals(c): false
+mismo hash:  true

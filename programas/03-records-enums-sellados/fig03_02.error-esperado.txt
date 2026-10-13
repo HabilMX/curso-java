@@ -1,0 +1,5 @@
+fig03_02.java:6: error: cannot assign a value to final variable tiempoMs
+  punto.tiempoMs = 5;
+       ^
+1 error
+error: compilation failed

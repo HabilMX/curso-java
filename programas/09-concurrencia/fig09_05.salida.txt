@@ -1,0 +1,2 @@
+pool fijo de 2 hilos virtuales: 2
+un hilo virtual por tarea: 6

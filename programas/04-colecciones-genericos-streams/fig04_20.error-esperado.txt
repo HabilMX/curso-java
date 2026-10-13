@@ -1,0 +1,4 @@
+a punto de pedir el valor
+Exception in thread "main" java.util.NoSuchElementException: No value present
+	at java.base/java.util.Optional.get(Optional.java:143)
+	at fig04_20.main(fig04_20.java:5)

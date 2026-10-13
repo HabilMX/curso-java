@@ -1,0 +1,5 @@
+armado == literal:       false
+armado.equals(literal):  true
+constante == literal:    true
+mayúsculas distintas:    false
+ignorando mayúsculas:    true

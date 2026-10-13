@@ -1,0 +1,3 @@
+pagos: 87
+Exception in thread "main" java.lang.NullPointerException: Cannot invoke "java.lang.Long.longValue()" because the return value of "java.util.Map.get(Object)" is null
+	at fig04_09.main(fig04_09.java:6)

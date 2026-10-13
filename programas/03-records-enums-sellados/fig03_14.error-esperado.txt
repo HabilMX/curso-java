@@ -1,0 +1,6 @@
+respondió 200
+no hay respuesta registrada
+Exception in thread "main" java.lang.NullPointerException
+	at java.base/java.util.Objects.requireNonNull(Objects.java:220)
+	at fig03_14.sinCasoNulo(fig03_14.java:17)
+	at fig03_14.main(fig03_14.java:26)

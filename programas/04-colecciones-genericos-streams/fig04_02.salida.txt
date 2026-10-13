@@ -1,0 +1,15 @@
+true
+true
+false
+[catalogo, pagos], tamaño 2
+{catalogo=142, inventario=2300, pagos=87}
+87
+null
+0
+false
+87
+{catalogo=142, inventario=2300, pagos=90}
+catalogo tardó 142 ms
+inventario tardó 2300 ms
+pagos tardó 90 ms
+{catalogo=142, inventario=2300, pagos=90}

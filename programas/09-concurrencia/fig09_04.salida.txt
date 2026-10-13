@@ -1,0 +1,1 @@
+tareas lanzadas: 6, máximo al mismo tiempo: 2

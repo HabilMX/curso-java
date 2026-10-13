@@ -1,0 +1,3 @@
+Servicio[nombre=catalogo, url=https://catalogo.example, timeoutMs=5000]
+Servicio[nombre=notificaciones, url=https://notificaciones.example, timeoutMs=1000]
+host de catalogo: catalogo.example

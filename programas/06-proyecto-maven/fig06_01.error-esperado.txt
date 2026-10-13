@@ -1,0 +1,5 @@
+fig06_01.java:2: error: package org.junit.jupiter.api does not exist
+import org.junit.jupiter.api.Test;
+                            ^
+1 error
+error: compilation failed

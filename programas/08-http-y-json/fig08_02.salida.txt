@@ -1,0 +1,3 @@
+código de estado: 200
+cuerpo: ok
+tardó al menos 87 ms: true

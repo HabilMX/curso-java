@@ -1,0 +1,58 @@
+# Patrones que NO pueden salir a internet. Este material es PÚBLICO.
+# Una línea por patrón (regex extendida). Las líneas con # son comentarios.
+# El pipeline falla si alguno aparece en un archivo .md.
+# Esta lista está hecha para CRECER: si encuentras algo, agrégalo aquí.
+
+# --- infraestructura de la casa ---
+cicd\.habil\.mx
+# TODO host de habil.mx es interno, «www» incluido: este patrón los veta todos.
+# Las únicas ligas públicas permitidas —los artículos del blog y la portada de un
+# curso— las exceptúa `verificar-publicable.sh`, que BORRA la liga permitida de la
+# línea y vuelve a probar este patrón en lo que queda.
+#
+# 🔴 POR QUÉ SE HACE ALLÁ Y NO AQUÍ, que es la lección que costó: antes la excepción
+# vivía DENTRO de este patrón, escrita como el complemento a mano de «todo lo que no
+# sea /<idioma>/blog/». Enumerar lo que NO se permite crece sin control —con cuatro
+# segmentos de curso en cinco idiomas es ilegible— y un paréntesis de más abre un
+# hueco que nadie ve. Y borrar el FRAGMENTO en vez de la línea es lo que impide que
+# una liga permitida tape un host interno escrito a su lado. Medido el 7-oct-2026.
+[a-z0-9-]+\.habil\.mx
+:914[0-9]
+hb-(go|node|java|uv|docker)-
+172\.16\.[0-9]
+192\.168\.[0-9]
+campus-(cicd|apps|mini|k8s|agent)
+habil-(mini|apps|cicd)
+mmss-lnx-
+hb-ai-lab
+
+# --- productos y clientes que todavía NO son públicos ---
+# Unuhi no se ha presentado públicamente: todo se atribuye a Hábil.
+[Uu][Nn][Uu][Hh][Ii]
+\bui-[a-z]{2}\b
+
+# --- rutas de máquinas reales ---
+/Users/[a-z]
+/home/dchavez
+
+# --- credenciales y tokens ---
+glpat-
+xox[baprs]-
+PMAK-
+AKIA[0-9A-Z]{16}
+-----BEGIN [A-Z ]*PRIVATE KEY-----
+
+# --- el curso no habla de asistentes ni de empresas de IA ---
+# (verificar-plantilla.sh lee TAMBIÉN este bloque: va hasta el final del archivo.
+#  Mayúsculas y minúsculas se escriben tal cual: «Cursor», «Llama» y «Bard» solo
+#  con mayúscula inicial (el verbo «llama» y el sustantivo «cursor» en minúscula
+#  son español común). Si una frase empieza con «Llama», se reescribe: «Invoca».)
+\bIA\b
+[Ii]nteligencia artificial
+[Cc]odex|[Cc]laude|ChatGPT|OpenAI|Anthropic|Copilot|Gemini|DeepSeek|Mistral|Perplexity
+\bLLMs?\b
+\bGPT-?[0-9o]|\bGPT\b
+[Mm]odelos? de lenguaje|[Gg]randes modelos
+[Aa]prendizaje autom[aá]tico|[Mm]achine learning
+[Aa]sistente de c[oó]digo|[Vv]ibe cod
+\bCursor\b|\bLlama\b|\bBard\b|[Cc]opiloto|Meta AI|\bGrok\b

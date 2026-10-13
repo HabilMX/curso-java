@@ -1,0 +1,24 @@
+{
+  "servicios": [
+    {"nombre": "servicio01", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio02", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio03", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio04", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio05", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio06", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio07", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio08", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio09", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio10", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio11", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio12", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio13", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio14", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio15", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio16", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio17", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio18", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio19", "url": "http://127.0.0.1:8089/espera/500"},
+    {"nombre": "servicio20", "url": "http://127.0.0.1:8089/espera/500"}
+  ]
+}

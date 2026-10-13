@@ -1,0 +1,5 @@
+true
+false
+pagos:87
+inventario
+revisando...

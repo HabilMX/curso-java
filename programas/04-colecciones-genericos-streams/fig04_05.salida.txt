@@ -1,0 +1,4 @@
+ingenuo: ReporteIngenuo[nombres=[catalogo, pagos, reportes]]
+seguro:  ReporteSeguro[nombres=[catalogo, pagos]]
+vista: [catalogo, pagos, reportes, facturacion]
+copia: [catalogo, pagos, reportes]

@@ -1,0 +1,5 @@
+2.3s
+2.3s
+2,3s
+[catalogo    ][ 142ms][200]
+pagos tardó 87 ms

@@ -1,0 +1,3 @@
+antes de usar el detalle
+Exception in thread "main" java.lang.NullPointerException: Cannot invoke "String.length()" because "<local1>" is null
+	at fig00_03.main(fig00_03.java:5)

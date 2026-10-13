@@ -1,0 +1,5 @@
+fig05_02.java:3: error: unreported exception IOException; must be caught or declared to be thrown
+  List<String> renglones = Files.readAllLines(Path.of("servicios.txt"));
+                                             ^
+1 error
+error: compilation failed

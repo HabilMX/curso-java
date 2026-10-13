@@ -1,0 +1,8 @@
+leyendo 5000
+  convertí 5000
+  (fin de la conversión)
+  resultado: 5000
+leyendo 5 s
+  no sirve: For input string: "5 s"
+  (fin de la conversión)
+  resultado: -1

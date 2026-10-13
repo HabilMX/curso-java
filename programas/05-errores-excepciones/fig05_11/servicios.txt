@@ -1,0 +1,5 @@
+# nombre      url                           [timeout_ms]
+catalogo      https://catalogo.example
+inventario    https://inventario.example
+pagos         https://pagos.example
+reportes      https://reportes.example

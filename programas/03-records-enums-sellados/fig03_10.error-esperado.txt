@@ -1,0 +1,5 @@
+fig03_10.java:9: error: the switch expression does not cover all possible input values
+  return switch (respuesta) {
+         ^
+1 error
+error: compilation failed

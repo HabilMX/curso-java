@@ -1,0 +1,4 @@
+http://127.0.0.1:8089/facturacion -> contestó 503
+http://127.0.0.1:8088/ -> java.net.ConnectException, mensaje: null
+http://127.0.0.1:8089/notificaciones -> java.net.http.HttpTimeoutException, mensaje: request timed out
+http://127.0.0.1:8089/basura -> java.io.IOException, mensaje: HTTP/1.1 header parser received no bytes

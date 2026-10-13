@@ -1,0 +1,5 @@
+[catalogo, inventario, pagos]
+Exception in thread "main" java.lang.UnsupportedOperationException
+	at java.base/java.util.ImmutableCollections.uoe(ImmutableCollections.java:159)
+	at java.base/java.util.ImmutableCollections$AbstractImmutableCollection.add(ImmutableCollections.java:164)
+	at fig04_04.main(fig04_04.java:5)

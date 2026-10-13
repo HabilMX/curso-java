@@ -1,0 +1,11 @@
+abro entrada
+abro salida
+trabajo con entrada y salida
+cierro salida
+cierro entrada
+--
+abro frágil
+trabajo con frágil
+cierro frágil
+atrapé: falló el trabajo
+  suprimida: no pude cerrar frágil

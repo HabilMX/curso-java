@@ -1,0 +1,5 @@
+# nombre      url
+catalogo      https://catalogo.example
+pagos         https://pagos.example
+renglones con salto final: true
+El servicio "inventario" tardó 2300 ms. Revísalo.

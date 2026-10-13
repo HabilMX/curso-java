@@ -1,0 +1,2 @@
+respondió 200 en 142 ms
+no respondió: sin conexión

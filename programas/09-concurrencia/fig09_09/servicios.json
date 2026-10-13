@@ -1,0 +1,8 @@
+{
+  "servicios": [
+    {"nombre": "catalogo", "url": "http://127.0.0.1:8089/catalogo"},
+    {"nombre": "inventario", "url": "http://127.0.0.1:8089/inventario"},
+    {"nombre": "pagos", "url": "http://127.0.0.1:8089/pagos"},
+    {"nombre": "reportes", "url": "http://127.0.0.1:8088/"}
+  ]
+}

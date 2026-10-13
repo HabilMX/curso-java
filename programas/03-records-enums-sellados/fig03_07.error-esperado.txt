@@ -1,0 +1,5 @@
+fig03_07.java:5: error: the switch expression does not cover all possible input values
+  return switch (estado) {
+         ^
+1 error
+error: compilation failed

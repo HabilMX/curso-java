@@ -1,0 +1,7 @@
+con una excepción:
+  catalogo: 142 ms
+  se cayó el lote: reportes: sin conexión
+con un valor:
+  catalogo: 142 ms
+  reportes: sin respuesta
+  pagos: 87 ms

@@ -1,0 +1,6 @@
+{
+  "servicios": [
+    {"nombre": "catalogo", "url": "http://127.0.0.1:8089/catalogo"},
+    {"nombre": "pagos", "url": "http://127.0.0.1:8089/pagos"}
+  ]
+}

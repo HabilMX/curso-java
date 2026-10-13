@@ -1,0 +1,5 @@
+fig04_13.java:5: error: local variables referenced from a lambda expression must be final or effectively final
+  tiempos.forEach(tiempo -> suma += tiempo);
+                            ^
+1 error
+error: compilation failed

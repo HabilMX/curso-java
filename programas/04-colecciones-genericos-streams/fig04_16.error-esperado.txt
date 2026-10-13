@@ -1,0 +1,5 @@
+3
+Exception in thread "main" java.lang.IllegalStateException: stream has already been operated upon or closed
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:260)
+	at java.base/java.util.stream.ReferencePipeline.count(ReferencePipeline.java:750)
+	at fig04_16.main(fig04_16.java:5)

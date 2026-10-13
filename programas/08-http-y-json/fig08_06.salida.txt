@@ -1,0 +1,5 @@
+¿es lista? true, elementos: 2
+nombre: pagos
+timeout_ms: 1000
+llave que no existe -> null
+la misma con path()  -> true

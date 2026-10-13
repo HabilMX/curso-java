@@ -1,0 +1,2 @@
+Exception in thread "main" java.lang.NullPointerException: Cannot invoke "java.lang.Integer.toString()" because the return value of "fig02_19.codigoDe(String)" is null
+	at fig02_19.main(fig02_19.java:3)

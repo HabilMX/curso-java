@@ -1,0 +1,3 @@
+[corrida r-001] revisando 4 servicios
+en un hilo nuevo, ligado = false
+fuera del bloque, ligado = false

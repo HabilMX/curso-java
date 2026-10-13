@@ -1,0 +1,7 @@
+fig01_02.java:3: error: cannot find symbol
+  IO.prinln("hola");
+    ^
+  symbol:   method prinln(String)
+  location: class IO
+1 error
+error: compilation failed

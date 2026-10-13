@@ -1,0 +1,3 @@
+antes:   [conectar, esperar]
+después: [CAMBIADO DESDE FUERA, CAMBIADO DESDE EL ACCESOR]
+copia.equals(otra): false

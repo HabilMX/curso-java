@@ -1,0 +1,3 @@
+lento
+después de la llamada, tiempoMs sigue valiendo 2300
+rápido

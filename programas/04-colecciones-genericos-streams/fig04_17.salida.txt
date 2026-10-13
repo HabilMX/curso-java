@@ -1,0 +1,6 @@
+{ARRIBA=2, CAIDO=1, LENTO=1}
+{ARRIBA=[catalogo, pagos], CAIDO=[reportes], LENTO=[inventario]}
+catalogo, inventario, pagos, reportes
+OptionalDouble[843.0]
+843
+OptionalDouble.empty

@@ -1,0 +1,8 @@
+orElse con valor presente:
+  (calculando el valor por omisión para orElse)
+catalogo
+orElseGet con valor presente:
+catalogo
+orElseGet con valor ausente:
+  (calculando el valor por omisión para orElseGet)
+ninguno

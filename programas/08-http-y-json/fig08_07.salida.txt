@@ -1,0 +1,5 @@
+timeout_ms: 1000 -> entra como 1000
+timeout_ms: 1.5 -> entra como 1
+timeout_ms: "1000" -> entra como 1000
+timeout_ms: true -> rechazado (MismatchedInputException)
+timeout_ms: -5 -> entra como -5

@@ -1,0 +1,4 @@
+Umbral[nombre=lento, limiteMs=1000]
+Exception in thread "main" java.lang.IllegalArgumentException: limiteMs debe ser mayor que 0 y llegó 0
+	at fig03_04$Umbral.<init>(fig03_04.java:6)
+	at fig03_04.main(fig03_04.java:14)

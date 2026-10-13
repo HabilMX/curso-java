@@ -1,0 +1,9 @@
+http://127.0.0.1:8089/pagos -> esquema http, servidor 127.0.0.1
+http://LOCALHOST:8089/pagos -> esquema http, servidor LOCALHOST
+http://127.0.0.1@169.254.169.254/latest/meta-data/ -> esquema http, servidor 169.254.169.254
+http://127.0.0.1.otro.example/pagos -> esquema http, servidor 127.0.0.1.otro.example
+http://[::1]:8089/pagos -> esquema http, servidor [::1]
+http://127.0.0.1:puerto/pagos -> esquema http, servidor null
+file:///etc/passwd -> esquema file, servidor null
+pagos -> esquema null, servidor null
+HttpRequest rechaza file: -> invalid URI scheme file

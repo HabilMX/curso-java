@@ -1,0 +1,4 @@
+¿marcado como interrumpido? true
+sleep lanzó: sleep interrupted
+¿sigue marcado? false
+¿y después de restaurarlo? true

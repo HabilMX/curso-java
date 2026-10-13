@@ -1,0 +1,2 @@
+pool de 50 hilos de plataforma, más de 3 s: true
+un hilo virtual por tarea, menos de 1 s: true

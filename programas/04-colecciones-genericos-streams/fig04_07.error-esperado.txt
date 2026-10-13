@@ -1,0 +1,7 @@
+fig04_07.java:3: error: unexpected type
+  List<int> tiempos = new ArrayList<>();
+       ^
+  required: reference
+  found:    int
+1 error
+error: compilation failed

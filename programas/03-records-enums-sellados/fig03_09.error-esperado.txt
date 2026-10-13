@@ -1,0 +1,5 @@
+fig03_09.java:8: error: class is not allowed to extend sealed class: Respuesta (as it is not listed in its 'permits' clause)
+record Redirigida(int codigo, String destino) implements Respuesta {}
+^
+1 error
+error: compilation failed

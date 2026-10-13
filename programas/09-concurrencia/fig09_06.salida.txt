@@ -1,0 +1,2 @@
+{ARRIBA=10000}
+total atómico: 10000

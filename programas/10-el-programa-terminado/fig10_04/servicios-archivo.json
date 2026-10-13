@@ -1,0 +1,5 @@
+{
+  "servicios": [
+    {"nombre": "secreto", "url": "file:///etc/passwd"}
+  ]
+}

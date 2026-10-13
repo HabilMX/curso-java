@@ -1,0 +1,5 @@
+fig05_04.java:7: error: exception NumberFormatException has already been caught
+  } catch (NumberFormatException e) {
+    ^
+1 error
+error: compilation failed

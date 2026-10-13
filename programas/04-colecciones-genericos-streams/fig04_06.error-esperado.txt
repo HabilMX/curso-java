@@ -1,0 +1,9 @@
+fig04_06.java:5: error: no suitable method found for add(String)
+  tiempos.add("87 ms");
+         ^
+    method List.add(Integer) is not applicable
+      (argument mismatch; String cannot be converted to Integer)
+    method List.add(int,Integer) is not applicable
+      (actual and formal argument lists differ in length)
+1 error
+error: compilation failed

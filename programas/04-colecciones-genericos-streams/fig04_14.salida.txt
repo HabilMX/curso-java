@@ -1,0 +1,6 @@
+[catalogo:142, inventario:2300]
+[catalogo:142, inventario:2300]
+true
+[catalogo, inventario, pagos]
+suma: 2529 ms
+rápidos: 1

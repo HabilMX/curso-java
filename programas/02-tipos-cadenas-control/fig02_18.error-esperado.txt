@@ -1,0 +1,3 @@
+código: null
+Exception in thread "main" java.lang.NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because "<local1>" is null
+	at fig02_18.main(fig02_18.java:5)

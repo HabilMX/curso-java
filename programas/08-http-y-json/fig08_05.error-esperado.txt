@@ -1,0 +1,18 @@
+fig08_05.java:2: error: package com.fasterxml.jackson.databind does not exist
+import com.fasterxml.jackson.databind.JsonNode;
+                                     ^
+fig08_05.java:3: error: package com.fasterxml.jackson.databind does not exist
+import com.fasterxml.jackson.databind.ObjectMapper;
+                                     ^
+fig08_05.java:6: error: cannot find symbol
+  JsonNode raiz = new ObjectMapper().readTree("{\"servicios\": []}");
+  ^
+  symbol:   class JsonNode
+  location: class fig08_05
+fig08_05.java:6: error: cannot find symbol
+  JsonNode raiz = new ObjectMapper().readTree("{\"servicios\": []}");
+                      ^
+  symbol:   class ObjectMapper
+  location: class fig08_05
+4 errors
+error: compilation failed

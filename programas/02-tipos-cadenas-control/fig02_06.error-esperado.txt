@@ -1,0 +1,6 @@
+fig02_06.java:3: error: cannot infer type for local variable respuesta
+  var respuesta = null;
+      ^
+  (variable initializer is 'null')
+1 error
+error: compilation failed

@@ -1,0 +1,7 @@
+SERVICIO    ESTADO    TIEMPO  DETALLE
+catalogo    ARRIBA     142ms  200
+inventario  LENTO       2.3s  200
+pagos       ARRIBA      87ms  200
+reportes    CAIDO          —  sin conexión
+
+4 servicios · 2 arriba · 1 lento · 1 caído · promedio 843ms

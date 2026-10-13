@@ -1,0 +1,7 @@
+el stream está armado; todavía no pasó nada
+miro catalogo
+  pasa catalogo
+miro inventario
+  pasa inventario
+miro pagos
+[catalogo, inventario]

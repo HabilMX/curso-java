@@ -1,0 +1,6 @@
+en el orden de la lista: lenta
+en el orden de la lista: rapida
+en el orden de la lista: mediana
+invokeAll regresó; la tarea 2 terminó: true
+get() lanza ExecutionException
+la causa es java.lang.IllegalStateException: fallé a propósito

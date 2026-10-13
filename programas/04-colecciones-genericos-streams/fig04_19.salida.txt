@@ -1,0 +1,10 @@
+Optional[87]
+Optional.empty
+true true
+87
+0
+87 ms
+sin tiempo
+pagos respondió en 87
+OptionalLong[142]
+142

@@ -1,0 +1,10 @@
+NoSuchFileException -> FileSystemException -> IOException -> Exception -> Throwable -> Object
+    verificada
+InterruptedException -> Exception -> Throwable -> Object
+    verificada
+NumberFormatException -> IllegalArgumentException -> RuntimeException -> Exception -> Throwable -> Object
+    no verificada
+NullPointerException -> RuntimeException -> Exception -> Throwable -> Object
+    no verificada
+OutOfMemoryError -> VirtualMachineError -> Error -> Throwable -> Object
+    error de la JVM

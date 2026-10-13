@@ -1,0 +1,17 @@
+{
+  "servicios" : [ {
+    "nombre" : "pagos",
+    "estado" : "ARRIBA",
+    "tiempo_ms" : 87,
+    "detalle" : "200"
+  }, {
+    "nombre" : "reportes",
+    "estado" : "CAIDO",
+    "tiempo_ms" : null,
+    "detalle" : "sin conexión"
+  } ],
+  "resumen" : {
+    "total" : 2,
+    "promedio_ms" : 87
+  }
+}

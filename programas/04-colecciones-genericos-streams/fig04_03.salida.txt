@@ -1,0 +1,4 @@
+2
+[Direccion[servidor=catalogo.example, puerto=443], Direccion[servidor=pagos.example, puerto=443]]
+equipo de cobranza
+null

@@ -1,0 +1,6 @@
+máximo de un int: 2147483647
+máximo + 1:       -2147483648
+máximo de un long: 9223372036854775807
+ms en un día:      86400000
+ms en 30 días (int):  -1702967296
+ms en 30 días (long): 2592000000

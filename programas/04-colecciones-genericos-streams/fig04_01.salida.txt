@@ -1,0 +1,13 @@
+[catalogo, inventario, pagos]
+tamaño: 3
+el segundo: inventario
+¿está pagos? true
+posición de pagos: 2
+primero y último: catalogo, pagos
+[catalogo-v2, reportes, inventario]
+servicio: catalogo-v2
+servicio: reportes
+servicio: inventario
+0 -> catalogo-v2
+1 -> reportes
+2 -> inventario

@@ -1,0 +1,9 @@
+LENTO
+name():    LENTO
+ordinal(): 1
+== :       true
+valueOf:   CAIDO
+values():  [ARRIBA, LENTO, CAIDO]
+revisar pronto
+ALTA pesa 10 y urgente = true
+BAJA urgente = false

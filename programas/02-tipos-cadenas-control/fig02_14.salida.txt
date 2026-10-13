@@ -1,0 +1,2 @@
+switch con dos puntos y sin break: 3
+switch con flecha:                2

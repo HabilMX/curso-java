@@ -1,0 +1,64 @@
+name: Verificar programas
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  verificar:
+    name: Compilar, ejecutar y revisar el curso
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Traer el repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar el JDK 25 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Decir con qué se va a verificar
+        run: |
+          java --version
+          mvn --version
+
+      - name: Comprobar que el revisor de material publicable se detecta a sí mismo
+        run: ./verificar-publicable.sh --probar
+
+      - name: Revisar que no haya material que no debe publicarse
+        run: ./verificar-publicable.sh
+
+      - name: La profundidad se mide (piso de 3,000 palabras por lección, mediana de 4,000)
+        run: herramientas/medir-profundidad.sh
+
+      - name: Cada lección cumple la plantilla
+        run: herramientas/verificar-plantilla.sh
+
+      - name: Las traducciones corresponden al español
+        run: herramientas/verificar-traducciones.sh
+
+      - name: Compilar y ejecutar los programas de las lecciones
+        run: herramientas/verificar-programas.sh
+
+      - name: Pruebas de los proyectos de Maven
+        run: |
+          set -e
+          encontrados=0
+          for pom in $(find programas -name pom.xml | sort); do
+            proyecto="$(dirname "$pom")"
+            encontrados=$((encontrados + 1))
+            echo "::group::$proyecto"
+            (cd "$proyecto" && mvn -B verify)
+            echo "::endgroup::"
+          done
+          if [ "$encontrados" -eq 0 ]; then
+            echo "No se encontró ningún proyecto de Maven: este paso no verificó nada."
+            exit 1
+          fi
+          echo "Proyectos de Maven construidos y probados: $encontrados"

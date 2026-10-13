@@ -1,0 +1,5 @@
+fig02_04.java:4: error: incompatible types: possible lossy conversion from long to int
+  int tiempoEntero = tiempoMs;
+                     ^
+1 error
+error: compilation failed

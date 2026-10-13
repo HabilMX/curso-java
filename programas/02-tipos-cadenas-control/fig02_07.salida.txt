@@ -1,0 +1,8 @@
+[  catalogo  ]
+[catalogo]
+longitud:    8
+mayúsculas:  CATALOGO
+¿contiene 'log'? true
+¿empieza con 'cat'? true
+recorte:     cat
+¿vacía?      true

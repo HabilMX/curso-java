@@ -1,0 +1,7 @@
+primitivo:  200
+envoltorio: 200
+nulo:       null
+¿iguales?   true
+127 == 127:   true
+2300 == 2300: false
+2300 equals:  true

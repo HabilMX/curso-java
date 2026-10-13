@@ -1,0 +1,5 @@
+fig02_16.java:4: error: the switch expression does not cover all possible input values
+  int codigo = switch (nombre) {
+               ^
+1 error
+error: compilation failed
