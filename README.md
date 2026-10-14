@@ -96,7 +96,7 @@ Cada programa es un archivo `figNN_NN.java` dentro de la carpeta de su lección,
 | `programas/` | los programas de las lecciones (uno por archivo, con su salida esperada) |
 | `herramientas/` | los guiones que verifican el curso (ver abajo) |
 | `.github/workflows/verificar.yml` | la verificación automática que muestra el sello |
-| `verificar-publicable.sh` | revisa que el material no contenga rutas internas ni claves antes de publicarlo |
+| `verificar-publicable.sh` | revisa que el material no contenga rutas internas ni claves antes de publicarlo. Se corre en el repositorio de trabajo: lee una lista de patrones que no se publica, porque enumerarlos en claro delataría justo lo que protegen |
 | `LICENSE.md` | CC BY-SA 4.0 |
 
 Dentro de `herramientas/`:
@@ -123,5 +123,5 @@ Se cuentan palabras y no líneas porque las líneas se inflan: una frase por lí
 - **Licencia CC BY-SA 4.0** (ver `LICENSE.md`): el material es público y se puede reusar citando la fuente.
 - **Multiidioma:** `es/` es el original; las traducciones se agregan después y un guion avisa cuando alguna quedó vieja respecto al español.
 - **El código no se traduce.** Los nombres de archivo, clases y datos quedan como están; se traducen las explicaciones, los ejercicios, los errores y el glosario.
-- `./verificar-publicable.sh` antes de publicar. Falla cerrado (si no pudo buscar, sale en error, no en verde) y trae autoprueba: siembra un patrón y exige detectarlo.
+- `./verificar-publicable.sh` antes de publicar, desde el repositorio de trabajo, que es donde vive su lista de patrones internos. Falla cerrado: si no pudo buscar, o si no llegó a revisar ni un patrón, sale en error y no en verde. Y trae autoprueba: siembra un patrón y exige detectarlo.
 - Sin emojis en los títulos de las lecciones.
