@@ -28,12 +28,6 @@ jobs:
           java --version
           mvn --version
 
-      - name: Comprobar que el revisor de material publicable se detecta a sí mismo
-        run: ./verificar-publicable.sh --probar
-
-      - name: Revisar que no haya material que no debe publicarse
-        run: ./verificar-publicable.sh
-
       - name: La profundidad se mide (piso de 3,000 palabras por lección, mediana de 4,000)
         run: herramientas/medir-profundidad.sh
 
@@ -68,3 +62,9 @@ jobs:
             exit 1
           fi
           echo "Proyectos de Maven construidos y probados: $encontrados"
+
+      - name: Nota sobre la revisión previa a publicar
+        run: |
+          echo "La revisión de material no publicable (rutas internas, nombres reservados,"
+          echo "direcciones de la infraestructura) se corre ANTES de publicar, con la lista"
+          echo "de patrones que vive en el repositorio de trabajo y no se publica."
