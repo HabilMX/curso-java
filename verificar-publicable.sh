@@ -29,6 +29,9 @@ if [ "$HB_VERIFICADOR_EN_CURSO" -ge 1 ]; then
 fi
 export HB_VERIFICADOR_EN_CURSO=$((HB_VERIFICADOR_EN_CURSO + 1))
 LISTA=.publicable-prohibido.txt
+# Los patrones internos viven aparte y NO se publican; sin ellos esta revision no
+# puede hacerse, y por eso falla cerrado en vez de salir en verde a medias.
+LISTA_INTERNA=.publicable-interno.txt
 
 # 🔴 UNA SOLA DEFINICION DE «LIGA PUBLICA PERMITIDA», Y VIVE AQUI. Antes el mismo
 # patron estaba escrito CUATRO veces —dos en la autoprueba y dos en el lazo—, asi
@@ -66,7 +69,7 @@ buscar() {
   local patron="$1" raiz="${2:-.}"
   local salida rc
   salida=$(grep -rnIE --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=target \
-             --exclude="$LISTA" -- "$patron" "$raiz" 2>&1); rc=$?
+             --exclude="$LISTA" --exclude="$LISTA_INTERNA" -- "$patron" "$raiz" 2>&1); rc=$?
   case "$rc" in
     0) printf '%s\n' "$salida"; return 1 ;;
     1) return 0 ;;
@@ -136,6 +139,7 @@ fi
 [ "${1:-}" = "--probar" ] && { echo "✅ autoprueba correcta: la búsqueda detecta y descarta bien."; exit 0; }
 
 [ -r "$LISTA" ] || { echo "❌ falta $LISTA"; exit 2; }
+[ -r "$LISTA_INTERNA" ] || { echo "❌ falta $LISTA_INTERNA: esta revision se corre en el repositorio de trabajo, antes de publicar"; exit 2; }
 
 # Control de que la búsqueda ve archivos: si no hay ninguno, no se revisó nada.
 nfiles=$(find . \( -name .git -o -name node_modules -o -name target \) -prune -o -type f -print | wc -l | tr -d ' ')
@@ -219,7 +223,7 @@ while IFS= read -r patron || [ -n "$patron" ]; do
     2) echo "⚠️  no se pudo buscar el patrón: $patron"
        errores=$((errores + 1)) ;;
   esac
-done < "$LISTA"
+done < <(cat "$LISTA" "$LISTA_INTERNA")
 
 if [ "$errores" -gt 0 ]; then
   echo
