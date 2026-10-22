@@ -990,8 +990,9 @@ final class Configuracion {
     URI url;
     try {
       url = new URI(campo.stringValue());
-    } catch (URISyntaxException e) {
-      throw new ErrorDeConfiguracion(prefijo + "'url' no es válida", e);
+    } catch (URISyntaxException _) {
+      // Sin la causa: su mensaje repite la dirección entera, con usuario, clave y token.
+      throw new ErrorDeConfiguracion(prefijo + "'url' no es válida");
     }
     String esquema = url.getScheme();
     if (!"http".equals(esquema) && !"https".equals(esquema)) {
@@ -1004,6 +1005,9 @@ final class Configuracion {
     if (!permitidos.contains(servidor)) {
       throw new ErrorDeConfiguracion(
           prefijo + "el servidor " + servidor + " no está en la lista permitida");
+    }
+    if (url.getRawUserInfo() != null) {
+      throw new ErrorDeConfiguracion(prefijo + "'url' no puede llevar usuario ni clave");
     }
     return url;
   }
@@ -1026,6 +1030,8 @@ final class Configuracion {
 
 Trois décisions méritent un commentaire. **La première : chaque erreur est une `ErrorDeConfiguracion` avec un message qui dit quoi corriger et où.** `servicio 2: falta 'nombre'` est un message qu'une personne peut utiliser ; un `NullPointerException` à la ligne 57, non. La position (`servicio 2`) compte à partir de 1, comme la compte une personne. **La deuxième : les erreurs de Jackson sont traduites.** `JacksonException` est une exception **non contrôlée** dans la version 3 (l'une des différences avec la 2), donc le compilateur ne t'oblige pas à l'attraper, et c'est pourquoi il est facile de l'oublier et de laisser un fichier mal écrit faire tomber le programme avec une trace. Le `catch` la convertit en `ErrorDeConfiguracion`, et au passage profite du fait que l'exception sait à quelle ligne et à quelle colonne le fichier est cassé (`getLocation()`). **La troisième : le fichier est d'abord lu en texte avec `Files.readString`**, avec la gestion d'erreurs de la Leçon 5 (`NoSuchFileException` devient « le fichier n'existe pas »), et c'est seulement alors qu'on passe le texte à Jackson. Chaque erreur a une seule origine, et chacune est traitée à sa place.
 
+**Une quatrième, de sécurité : une `url` avec utilisateur ou mot de passe est rejetée au chargement, et aucun message ne répète l'adresse.** `http://usuario:clave@127.0.0.1:1/estado` a le schéma `http`, a un hôte, et l'hôte est dans la liste autorisée ; mais ce qui précède l'arobase (`getRawUserInfo()`) est un identifiant, et le `revisor` le porterait dans tout ce qu'il écrit. C'est pourquoi elle est rejetée avec `'url' no puede llevar usuario ni clave`, un message qui ne la répète pas, et pourquoi le `catch` de `URISyntaxException` ne passe plus l'exception comme cause : son message porte l'adresse entière, avec ce qu'elle contient. La vérification vient après la liste autorisée exprès : `http://127.0.0.1@169.254.169.254/` reste rejetée à cause de son hôte, comme tu le verras en 8.8.3.
+
 Voici les messages qu'il produit. La position compte à partir de 1. Les tests ci-dessous surveillent les plus dangereux ; pour les autres, c'est toi qui les provoques dans l'exercice 3 :
 
 | Cas | Message |
@@ -1039,6 +1045,7 @@ Voici les messages qu'il produit. La position compte à partir de 1. Les tests c
 | url qui n'est pas `http`/`https` | `servicio 2: 'url' debe empezar con http:// o https://` |
 | url sans hôte ou mal écrite | `servicio 2: 'url' no es válida` |
 | hôte hors de la liste autorisée | `servicio 2: el servidor 169.254.169.254 no está en la lista permitida` |
+| url avec utilisateur ou mot de passe | `servicio 2: 'url' no puede llevar usuario ni clave` |
 | délai maximal invalide | `servicio 3: 'timeout_ms' debe ser un entero mayor que 0` |
 | noms répétés | `nombres repetidos: catalogo` |
 
@@ -1253,6 +1260,7 @@ La deuxième, `ReporteJson`, est la **forme** du JSON, séparée exprès des typ
 
 package mx.habil.revisor;
 
+import java.net.URI;
 import java.util.List;
 import java.util.OptionalLong;
 
@@ -1277,7 +1285,7 @@ record ReporteJson(List<Fila> servicios, ResumenJson resumen) {
                 r ->
                     new Fila(
                         r.servicio().nombre(),
-                        r.servicio().url().toString(),
+                        sinSecretos(r.servicio().url()),
                         r.estado(),
                         nulo(r.tiempoMs()),
                         r.detalle()))
@@ -1293,13 +1301,23 @@ record ReporteJson(List<Fila> servicios, ResumenJson resumen) {
             nulo(resumen.promedioMs())));
   }
 
+  /**
+   * La dirección sin usuario, clave, consulta ni fragmento: solo esquema, servidor, puerto y
+   * ruta. El reporte lo lee quien lo pida, y una consulta puede traer un token.
+   */
+  static String sinSecretos(URI url) {
+    String puerto = url.getPort() == -1 ? "" : ":" + url.getPort();
+    String ruta = url.getRawPath() == null ? "" : url.getRawPath();
+    return url.getScheme() + "://" + url.getHost() + puerto + ruta;
+  }
+
   private static Long nulo(OptionalLong valor) {
     return valor.isPresent() ? valor.getAsLong() : null;
   }
 }
 ```
 
-La méthode `de` convertit un `Reporte` en sa forme de JSON, et la conversion d'`OptionalLong` en `Long` (`nulo`) est ce qui produit le `null` des services sans réponse. Le constructeur compact avec `List.copyOf` est la copie défensive de la Leçon 4 ; la Leçon 10 montre ce que dit (et ce que ne dit pas) un outil d'analyse à son sujet. La troisième pièce est `Formato`, qui gagne une méthode, `json`, et c'est le seul changement d'un fichier dont tu connais déjà le reste :
+La méthode `de` convertit un `Reporte` en sa forme de JSON, et la conversion d'`OptionalLong` en `Long` (`nulo`) est ce qui produit le `null` des services sans réponse. Le champ `url` n'est pas non plus `url().toString()` : c'est `sinSecretos(url)`, qui reconstruit l'adresse avec le schéma, l'hôte, le port et le chemin, et laisse de côté utilisateur, mot de passe, requête (`?token=...`) et fragment (`#...`). Le JSON est un contrat avec qui le lit, donc le champ reste et garde sa forme ; ce qu'on enlève, c'est ce que ce lecteur ne doit pas voir. Avec `http://127.0.0.1:1/estado?token=SECRETO#x` dans `servicios.json`, le JSON dit `"url" : "http://127.0.0.1:1/estado"`. Le constructeur compact avec `List.copyOf` est la copie défensive de la Leçon 4 ; la Leçon 10 montre ce que dit (et ce que ne dit pas) un outil d'analyse à son sujet. La troisième pièce est `Formato`, qui gagne une méthode, `json`, et c'est le seul changement d'un fichier dont tu connais déjà le reste :
 
 ```java
 // fig08_10/src/main/java/mx/habil/revisor/Formato.java

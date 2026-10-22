@@ -9,6 +9,11 @@
 #                                                   encendido y Jackson 3 en el classpath,
 #                                                   que la lección manda preparar a mano
 # Falla cerrado: si no encuentra programas, sale en error, no en verde.
+#
+# Al final corre, OBLIGATORIA, la prueba de la URL sembrada (verificar-url-sembrada.sh): los
+# seis revisores, de la lección 5 a la 10, rechazan al cargar una URL con usuario o clave y no
+# repiten sus secretos en ningún error ni reporte. Si ese guion falta o sale en rojo, este
+# también. Necesita Maven para el classpath de las lecciones 8 a 10.
 set -uo pipefail
 
 RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -91,3 +96,12 @@ fi
 
 echo
 echo "✅ cada programa compila, corre y dice lo que la lección documenta."
+
+# ─── la prueba de la URL sembrada: obligatoria ──────────────────────────────────────────
+echo
+URL_SEMBRADA="$RAIZ/herramientas/verificar-url-sembrada.sh"
+if [ ! -f "$URL_SEMBRADA" ]; then
+  echo "❌ falta herramientas/verificar-url-sembrada.sh: la prueba de la URL sembrada es obligatoria"
+  exit 1
+fi
+bash "$URL_SEMBRADA" || exit 1

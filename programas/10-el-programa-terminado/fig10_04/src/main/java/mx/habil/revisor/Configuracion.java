@@ -106,8 +106,9 @@ final class Configuracion {
     URI url;
     try {
       url = new URI(campo.stringValue());
-    } catch (URISyntaxException e) {
-      throw new ErrorDeConfiguracion(prefijo + "'url' no es válida", e);
+    } catch (URISyntaxException _) {
+      // Sin la causa: su mensaje repite la dirección entera, con usuario, clave y token.
+      throw new ErrorDeConfiguracion(prefijo + "'url' no es válida");
     }
     String esquema = url.getScheme();
     if (!"http".equals(esquema) && !"https".equals(esquema)) {
@@ -120,6 +121,9 @@ final class Configuracion {
     if (!permitidos.contains(servidor)) {
       throw new ErrorDeConfiguracion(
           prefijo + "el servidor " + servidor + " no está en la lista permitida");
+    }
+    if (url.getRawUserInfo() != null) {
+      throw new ErrorDeConfiguracion(prefijo + "'url' no puede llevar usuario ni clave");
     }
     return url;
   }

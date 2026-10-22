@@ -856,11 +856,21 @@ final class Configuracion {
       throw new ErrorDeConfiguracion(
           "renglón " + numero + ": la url debe empezar con http:// o https://");
     }
+    URI url;
     try {
-      return new URI(texto);
-    } catch (URISyntaxException e) {
-      throw new ErrorDeConfiguracion("renglón " + numero + ": la url no es válida", e);
+      url = new URI(texto);
+    } catch (URISyntaxException _) {
+      // Sin la causa: su mensaje repite la dirección entera, con usuario, clave y token.
+      throw new ErrorDeConfiguracion("renglón " + numero + ": la url no es válida");
     }
+    if (url.getHost() == null) {
+      throw new ErrorDeConfiguracion("renglón " + numero + ": la url no es válida");
+    }
+    if (url.getRawUserInfo() != null) {
+      throw new ErrorDeConfiguracion(
+          "renglón " + numero + ": la url no puede llevar usuario ni clave");
+    }
+    return url;
   }
 
   static int leerTimeout(String texto, int numero) throws ErrorDeConfiguracion {
@@ -895,7 +905,7 @@ final class Configuracion {
 
 **`leerRenglon`** (“read line”) splits the line into fields with `renglon.split("\\s+")`. `split` receives a **regular expression** (a description of a text pattern) and returns an **array** of texts: `\s+` means “one or more spaces or tabs”, and is written with a double backslash because in a Java text the backslash has a use of its own (`\n`, `\"`) and has to be written twice for one to arrive. An **array** (`String[]`) is a fixed-size sequence: it is consulted with `campos[0]` (the first) and its size is `campos.length`, without parentheses, because it is a datum and not a method. It is the same type as `String[] args`, which you will see in lesson 6. If there are fewer than two fields or more than three, the message says how many there are: `renglón 3: se esperaban 2 o 3 campos y hay 1` (“line 3: 2 or 3 fields were expected and there is 1”).
 
-**`leerUrl`** and **`leerTimeout`** are the two validators. `leerUrl` rejects whatever does not start with `http://` or `https://` (first filter, with its message) and then tries to build a `URI` with `new URI(texto)`. That form throws `URISyntaxException`, checked, when the address is badly written, and `leerUrl` converts it into `ErrorDeConfiguracion` with the `URISyntaxException` as the cause. (It is the reason for using `new URI(...)` and not `URI.create(...)`, which you used in lesson 3: `URI.create` wraps the same exception in an unchecked one, and here it is better to see it as it is.) `leerTimeout` converts the text with `Integer.parseInt` and rejects whatever is not an integer greater than zero. Notice how it is written, because it is a useful pattern: the `try` attempts the conversion and, if the number is valid, **returns right there**; if the conversion fails, the `catch` throws the error with the `NumberFormatException` as the cause; and if the conversion works but the number is not greater than zero, the `try` returns nothing and the flow falls to the last line, which throws the same message without a cause. One message, two error paths.
+**`leerUrl`** and **`leerTimeout`** are the two validators. `leerUrl` rejects whatever does not start with `http://` or `https://` (first filter, with its message) and then tries to build a `URI` with `new URI(texto)`. That form throws `URISyntaxException`, checked, when the address is badly written, and `leerUrl` converts it into `ErrorDeConfiguracion`, this time **without** passing it as the cause: the message of `URISyntaxException` repeats the whole address, and if it carries a user, a password or a `token` in the query, any stack trace that shows the cause would publish them. Once the `URI` is built, `leerUrl` demands two more things: that it has a host (`getHost()` is not `null`) and that it carries no user or password (`getRawUserInfo()` is `null`). With `http://usuario:clave@127.0.0.1:1/estado` the message is `renglón 1: la url no puede llevar usuario ni clave` (line 1: the url cannot carry a user or password): it says what to fix and does not repeat the address. (It is the reason for using `new URI(...)` and not `URI.create(...)`, which you used in lesson 3: `URI.create` wraps the same exception in an unchecked one, and here it is better to see it as it is.) `leerTimeout` converts the text with `Integer.parseInt` and rejects whatever is not an integer greater than zero. Notice how it is written, because it is a useful pattern: the `try` attempts the conversion and, if the number is valid, **returns right there**; if the conversion fails, the `catch` throws the error with the `NumberFormatException` as the cause; and if the conversion works but the number is not greater than zero, the `try` returns nothing and the flow falls to the last line, which throws the same message without a cause. One message, two error paths.
 
 **`verificarRepetidos`** (“check repeats”) uses the trick from section 4.1.2: `vistos.add(nombre)` returns `false` if the name was already there, and those names are gathered in a `LinkedHashSet` (which keeps the order in which they were found) and `String.join(", ", repetidos)`, which joins the elements with a separator, lists them all in the message: `nombres repetidos: catalogo` (“repeated names: catalogo”). A detail about what this method does: **the program stops at the first error**, and does not gather all the file's errors to report them at once. It is simpler, and enough for a four-line file.
 

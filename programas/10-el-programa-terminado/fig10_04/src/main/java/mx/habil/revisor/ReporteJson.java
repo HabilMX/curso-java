@@ -2,6 +2,7 @@
 
 package mx.habil.revisor;
 
+import java.net.URI;
 import java.util.List;
 import java.util.OptionalLong;
 
@@ -26,7 +27,7 @@ record ReporteJson(List<Fila> servicios, ResumenJson resumen) {
                 r ->
                     new Fila(
                         r.servicio().nombre(),
-                        r.servicio().url().toString(),
+                        sinSecretos(r.servicio().url()),
                         r.estado(),
                         nulo(r.tiempoMs()),
                         r.detalle()))
@@ -40,6 +41,16 @@ record ReporteJson(List<Fila> servicios, ResumenJson resumen) {
             resumen.lento(),
             resumen.caido(),
             nulo(resumen.promedioMs())));
+  }
+
+  /**
+   * La dirección sin usuario, clave, consulta ni fragmento: solo esquema, servidor, puerto y
+   * ruta. El reporte lo lee quien lo pida, y una consulta puede traer un token.
+   */
+  static String sinSecretos(URI url) {
+    String puerto = url.getPort() == -1 ? "" : ":" + url.getPort();
+    String ruta = url.getRawPath() == null ? "" : url.getRawPath();
+    return url.getScheme() + "://" + url.getHost() + puerto + ruta;
   }
 
   private static Long nulo(OptionalLong valor) {

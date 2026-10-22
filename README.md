@@ -103,7 +103,8 @@ Dentro de `herramientas/`:
 
 | | |
 |---|---|
-| `verificar-programas.sh` | compila y ejecuta los programas de las lecciones con Java 25 y compara la salida real contra la documentada; salta la lección 8, que necesita el laboratorio encendido y las bibliotecas en el *classpath* |
+| `verificar-programas.sh` | compila y ejecuta los programas de las lecciones con Java 25 y compara la salida real contra la documentada; salta la lección 8, que necesita el laboratorio encendido y las bibliotecas en el *classpath*; al final corre, obligatoria, `verificar-url-sembrada.sh` |
+| `verificar-url-sembrada.sh` | la prueba de la URL sembrada, que `verificar-programas.sh` corre siempre al final: compila los seis revisores (lecciones 5 a 10) con una prueba de `herramientas/url-sembrada/` y exige que una URL con usuario o clave se rechace al cargar y que ningún error ni reporte (tabla, JSON, `/reporte`) repita usuario, clave, consulta ni fragmento. Falla si la prueba falta, si un revisor sale en rojo o si corrió en menos de seis |
 | `verificar-extractos.sh` | comprueba que cada bloque de código de las lecciones diga lo mismo que su archivo de `programas/`; con `--probar` siembra una diferencia y exige detectarla |
 | `verificar-plantilla.sh` | comprueba que cada lección tenga las partes de la plantilla, objetivos, ejercicios y fuentes en el número pedido |
 | `medir-profundidad.sh` | mide las palabras de explicación por lección |

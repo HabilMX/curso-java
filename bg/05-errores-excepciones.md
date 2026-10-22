@@ -856,11 +856,21 @@ final class Configuracion {
       throw new ErrorDeConfiguracion(
           "renglón " + numero + ": la url debe empezar con http:// o https://");
     }
+    URI url;
     try {
-      return new URI(texto);
-    } catch (URISyntaxException e) {
-      throw new ErrorDeConfiguracion("renglón " + numero + ": la url no es válida", e);
+      url = new URI(texto);
+    } catch (URISyntaxException _) {
+      // Sin la causa: su mensaje repite la dirección entera, con usuario, clave y token.
+      throw new ErrorDeConfiguracion("renglón " + numero + ": la url no es válida");
     }
+    if (url.getHost() == null) {
+      throw new ErrorDeConfiguracion("renglón " + numero + ": la url no es válida");
+    }
+    if (url.getRawUserInfo() != null) {
+      throw new ErrorDeConfiguracion(
+          "renglón " + numero + ": la url no puede llevar usuario ni clave");
+    }
+    return url;
   }
 
   static int leerTimeout(String texto, int numero) throws ErrorDeConfiguracion {
@@ -895,7 +905,7 @@ final class Configuracion {
 
 **`leerRenglon`** разделя реда на полета с `renglon.split("\\s+")`. `split` получава **регулярен израз** (описание на текстов шаблон) и връща **масив** от текстове: `\s+` значи „един или повече интервала или табулации“ и се пише с двойна обратна наклонена черта, защото в текст на Java обратната наклонена черта има собствена употреба (`\n`, `\"`) и трябва да се напише два пъти, за да стигне една. **Масивът** (`String[]`) е последователност с фиксиран размер: достъпва се с `campos[0]` (първия) и размерът му е `campos.length`, без скоби, защото е стойност, а не метод. Това е същият тип като `String[] args`, който ще видиш в урок 6. Ако полетата са по-малко от две или повече от три, съобщението казва колко са: `renglón 3: se esperaban 2 o 3 campos y hay 1` (ред 3: очаквани са 2 или 3 полета, а има 1).
 
-**`leerUrl`** и **`leerTimeout`** са двата валидатора. `leerUrl` отхвърля това, което не започва с `http://` или `https://` (първи филтър, със своето съобщение) и после се опитва да построи `URI` с `new URI(texto)`. Тази форма хвърля `URISyntaxException`, проверявана, когато адресът е грешно написан, и `leerUrl` я превръща в `ErrorDeConfiguracion` с `URISyntaxException` като причина. (Това е причината да се използва `new URI(...)`, а не `URI.create(...)`, което използваше в урок 3: `URI.create` обвива същото изключение в непроверявано, а тук е добре да го видим такова, каквото е.) `leerTimeout` превръща текста с `Integer.parseInt` и отхвърля всичко, което не е цяло число, по-голямо от нула. Обърни внимание как е написано, защото е полезен шаблон: `try` опитва преобразуването и, ако числото е валидно, **връща още там**; ако преобразуването се провали, `catch` хвърля грешката с `NumberFormatException` като причина; а ако преобразуването сполучи, но числото не е по-голямо от нула, `try` не връща нищо и изпълнението пада на последния ред, който хвърля същото съобщение без причина. Едно съобщение, два пътя към грешката.
+**`leerUrl`** и **`leerTimeout`** са двата валидатора. `leerUrl` отхвърля това, което не започва с `http://` или `https://` (първи филтър, със своето съобщение) и после се опитва да построи `URI` с `new URI(texto)`. Тази форма хвърля `URISyntaxException`, проверявана, когато адресът е грешно написан, и `leerUrl` я превръща в `ErrorDeConfiguracion`, този път **без** да я подава като причина: съобщението на `URISyntaxException` повтаря целия адрес и ако той носи потребител, парола или `token` в запитването, всяка следа на стека, която показва причината, би ги публикувала. След като `URI` е построен, `leerUrl` изисква още две неща: да има сървър (`getHost()` не е `null`) и да не носи потребител или парола (`getRawUserInfo()` е `null`). С `http://usuario:clave@127.0.0.1:1/estado` съобщението е `renglón 1: la url no puede llevar usuario ni clave`: казва какво да се поправи и не повтаря адреса. (Това е причината да се използва `new URI(...)`, а не `URI.create(...)`, което използваше в урок 3: `URI.create` обвива същото изключение в непроверявано, а тук е добре да го видим такова, каквото е.) `leerTimeout` превръща текста с `Integer.parseInt` и отхвърля всичко, което не е цяло число, по-голямо от нула. Обърни внимание как е написано, защото е полезен шаблон: `try` опитва преобразуването и, ако числото е валидно, **връща още там**; ако преобразуването се провали, `catch` хвърля грешката с `NumberFormatException` като причина; а ако преобразуването сполучи, но числото не е по-голямо от нула, `try` не връща нищо и изпълнението пада на последния ред, който хвърля същото съобщение без причина. Едно съобщение, два пътя към грешката.
 
 **`verificarRepetidos`** използва трика от раздел 4.1.2: `vistos.add(nombre)` връща `false`, ако името вече е било там, и тези имена се събират в `LinkedHashSet` (който запазва реда, в който са намерени), а `String.join(", ", repetidos)`, който съединява елементите с разделител, ги изброява всичките в съобщението: `nombres repetidos: catalogo` (повтарящи се имена: catalogo). Подробност за това какво прави този метод: **програмата спира при първата грешка** и не събира всички грешки на файла, за да ги каже наведнъж. По-просто е и е достатъчно за файл от четири реда.
 

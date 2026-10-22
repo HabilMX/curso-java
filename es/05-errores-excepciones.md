@@ -856,11 +856,21 @@ final class Configuracion {
       throw new ErrorDeConfiguracion(
           "renglón " + numero + ": la url debe empezar con http:// o https://");
     }
+    URI url;
     try {
-      return new URI(texto);
-    } catch (URISyntaxException e) {
-      throw new ErrorDeConfiguracion("renglón " + numero + ": la url no es válida", e);
+      url = new URI(texto);
+    } catch (URISyntaxException _) {
+      // Sin la causa: su mensaje repite la dirección entera, con usuario, clave y token.
+      throw new ErrorDeConfiguracion("renglón " + numero + ": la url no es válida");
     }
+    if (url.getHost() == null) {
+      throw new ErrorDeConfiguracion("renglón " + numero + ": la url no es válida");
+    }
+    if (url.getRawUserInfo() != null) {
+      throw new ErrorDeConfiguracion(
+          "renglón " + numero + ": la url no puede llevar usuario ni clave");
+    }
+    return url;
   }
 
   static int leerTimeout(String texto, int numero) throws ErrorDeConfiguracion {
@@ -895,7 +905,7 @@ final class Configuracion {
 
 **`leerRenglon`** parte el renglón en campos con `renglon.split("\\s+")`. `split` recibe una **expresión regular** (una descripción de un patrón de texto) y devuelve un **arreglo** de textos: `\s+` significa «uno o más espacios o tabuladores», y se escribe con doble barra invertida porque en un texto de Java la barra invertida tiene un uso propio (`\n`, `\"`) y hay que escribirla dos veces para que llegue una. Un **arreglo** (`String[]`) es una secuencia de tamaño fijo: se consulta con `campos[0]` (el primero) y su tamaño es `campos.length`, sin paréntesis, porque es un dato y no un método. Es el mismo tipo de `String[] args` que verás en la lección 6. Si hay menos de dos campos o más de tres, el mensaje dice cuántos hay: `renglón 3: se esperaban 2 o 3 campos y hay 1`.
 
-**`leerUrl`** y **`leerTimeout`** son los dos validadores. `leerUrl` rechaza lo que no empiece con `http://` o `https://` (primer filtro, con su mensaje) y luego intenta construir un `URI` con `new URI(texto)`. Esa forma lanza `URISyntaxException`, verificada, cuando la dirección está mal escrita, y `leerUrl` la convierte en `ErrorDeConfiguracion` con la `URISyntaxException` como causa. (Es la razón de usar `new URI(...)` y no `URI.create(...)`, que usabas en la lección 3: `URI.create` envuelve la misma excepción en una no verificada, y aquí conviene verla tal cual.) `leerTimeout` convierte el texto con `Integer.parseInt` y rechaza lo que no sea un entero mayor que cero. Fíjate en cómo está escrito, porque es un patrón útil: el `try` intenta la conversión y, si el número es válido, **devuelve ahí mismo**; si la conversión falla, el `catch` lanza el error con la `NumberFormatException` como causa; y si la conversión funciona pero el número no es mayor que cero, el `try` no devuelve nada y el flujo cae a la última línea, que lanza el mismo mensaje sin causa. Un mensaje, dos caminos de error.
+**`leerUrl`** y **`leerTimeout`** son los dos validadores. `leerUrl` rechaza lo que no empiece con `http://` o `https://` (primer filtro, con su mensaje) y luego intenta construir un `URI` con `new URI(texto)`. Esa forma lanza `URISyntaxException`, verificada, cuando la dirección está mal escrita, y `leerUrl` la convierte en `ErrorDeConfiguracion`, esta vez **sin** pasarla como causa: el mensaje de `URISyntaxException` repite la dirección entera, y si trae usuario, clave o un `token` en la consulta, cualquier traza que muestre la causa los publicaría. Ya construido el `URI`, `leerUrl` exige dos cosas más: que tenga servidor (`getHost()` no es `null`) y que no traiga usuario ni clave (`getRawUserInfo()` es `null`). Con `http://usuario:clave@127.0.0.1:1/estado` el mensaje es `renglón 1: la url no puede llevar usuario ni clave`: dice qué arreglar y no repite la dirección. (Es la razón de usar `new URI(...)` y no `URI.create(...)`, que usabas en la lección 3: `URI.create` envuelve la misma excepción en una no verificada, y aquí conviene verla tal cual.) `leerTimeout` convierte el texto con `Integer.parseInt` y rechaza lo que no sea un entero mayor que cero. Fíjate en cómo está escrito, porque es un patrón útil: el `try` intenta la conversión y, si el número es válido, **devuelve ahí mismo**; si la conversión falla, el `catch` lanza el error con la `NumberFormatException` como causa; y si la conversión funciona pero el número no es mayor que cero, el `try` no devuelve nada y el flujo cae a la última línea, que lanza el mismo mensaje sin causa. Un mensaje, dos caminos de error.
 
 **`verificarRepetidos`** usa el truco de la sección 4.1.2: `vistos.add(nombre)` devuelve `false` si el nombre ya estaba, y esos nombres se juntan en un `LinkedHashSet` (que conserva el orden en que se encontraron) y `String.join(", ", repetidos)`, que une los elementos con un separador, los lista todos en el mensaje: `nombres repetidos: catalogo`. Un detalle sobre qué hace este método: **el programa se detiene en el primer error**, y no junta todos los errores del archivo para decirlos de una vez. Es más simple, y suficiente para un archivo de cuatro renglones.
 

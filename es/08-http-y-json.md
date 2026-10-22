@@ -990,8 +990,9 @@ final class Configuracion {
     URI url;
     try {
       url = new URI(campo.stringValue());
-    } catch (URISyntaxException e) {
-      throw new ErrorDeConfiguracion(prefijo + "'url' no es válida", e);
+    } catch (URISyntaxException _) {
+      // Sin la causa: su mensaje repite la dirección entera, con usuario, clave y token.
+      throw new ErrorDeConfiguracion(prefijo + "'url' no es válida");
     }
     String esquema = url.getScheme();
     if (!"http".equals(esquema) && !"https".equals(esquema)) {
@@ -1004,6 +1005,9 @@ final class Configuracion {
     if (!permitidos.contains(servidor)) {
       throw new ErrorDeConfiguracion(
           prefijo + "el servidor " + servidor + " no está en la lista permitida");
+    }
+    if (url.getRawUserInfo() != null) {
+      throw new ErrorDeConfiguracion(prefijo + "'url' no puede llevar usuario ni clave");
     }
     return url;
   }
@@ -1026,6 +1030,8 @@ final class Configuracion {
 
 Tres decisiones valen un comentario. **La primera: cada falla es un `ErrorDeConfiguracion` con un mensaje que dice qué arreglar y dónde.** `servicio 2: falta 'nombre'` es un mensaje que una persona puede usar; un `NullPointerException` en la línea 57 no. La posición (`servicio 2`) cuenta desde 1, como la cuenta una persona. **La segunda: los errores de Jackson se traducen.** `JacksonException` es una excepción **no verificada** en la versión 3 (una de las diferencias con la 2), así que el compilador no te obliga a atraparla, y por eso es fácil olvidarla y dejar que un archivo mal escrito tumbe el programa con una traza. El `catch` la convierte en `ErrorDeConfiguracion`, y de paso aprovecha que la excepción sabe en qué renglón y columna del archivo se rompió (`getLocation()`). **La tercera: el archivo se lee primero a texto con `Files.readString`**, con el manejo de errores de la Lección 5 (`NoSuchFileException` se vuelve «no existe el archivo»), y recién entonces se le pasa el texto a Jackson. Cada error tiene un solo origen, y cada cual se trata en su lugar.
 
+**Una cuarta, de seguridad: una `url` con usuario o clave se rechaza al cargar, y ningún mensaje repite la dirección.** `http://usuario:clave@127.0.0.1:1/estado` tiene esquema `http`, tiene servidor y el servidor está en la lista permitida; pero lo que va antes de la arroba (`getRawUserInfo()`) es una credencial, y el `revisor` la llevaría a todo lo que escribe. Por eso se rechaza con `'url' no puede llevar usuario ni clave`, un mensaje que no la repite, y por eso el `catch` de `URISyntaxException` ya no pasa la excepción como causa: su mensaje trae la dirección entera, con lo que lleve. La comprobación va después de la lista permitida a propósito: `http://127.0.0.1@169.254.169.254/` se sigue rechazando por su servidor, como verás en 8.8.3.
+
 Estos son los mensajes que produce. La posición cuenta desde 1. Las pruebas de más abajo vigilan los más peligrosos; con los demás, los provocas tú en el ejercicio 3:
 
 | Caso | Mensaje |
@@ -1039,6 +1045,7 @@ Estos son los mensajes que produce. La posición cuenta desde 1. Las pruebas de 
 | url que no es `http`/`https` | `servicio 2: 'url' debe empezar con http:// o https://` |
 | url sin servidor o mal escrita | `servicio 2: 'url' no es válida` |
 | servidor fuera de la lista permitida | `servicio 2: el servidor 169.254.169.254 no está en la lista permitida` |
+| url con usuario o clave | `servicio 2: 'url' no puede llevar usuario ni clave` |
 | tiempo límite inválido | `servicio 3: 'timeout_ms' debe ser un entero mayor que 0` |
 | nombres repetidos | `nombres repetidos: catalogo` |
 
@@ -1253,6 +1260,7 @@ La segunda, `ReporteJson`, es la **forma** del JSON, separada a propósito de lo
 
 package mx.habil.revisor;
 
+import java.net.URI;
 import java.util.List;
 import java.util.OptionalLong;
 
@@ -1277,7 +1285,7 @@ record ReporteJson(List<Fila> servicios, ResumenJson resumen) {
                 r ->
                     new Fila(
                         r.servicio().nombre(),
-                        r.servicio().url().toString(),
+                        sinSecretos(r.servicio().url()),
                         r.estado(),
                         nulo(r.tiempoMs()),
                         r.detalle()))
@@ -1293,13 +1301,23 @@ record ReporteJson(List<Fila> servicios, ResumenJson resumen) {
             nulo(resumen.promedioMs())));
   }
 
+  /**
+   * La dirección sin usuario, clave, consulta ni fragmento: solo esquema, servidor, puerto y
+   * ruta. El reporte lo lee quien lo pida, y una consulta puede traer un token.
+   */
+  static String sinSecretos(URI url) {
+    String puerto = url.getPort() == -1 ? "" : ":" + url.getPort();
+    String ruta = url.getRawPath() == null ? "" : url.getRawPath();
+    return url.getScheme() + "://" + url.getHost() + puerto + ruta;
+  }
+
   private static Long nulo(OptionalLong valor) {
     return valor.isPresent() ? valor.getAsLong() : null;
   }
 }
 ```
 
-El método `de` convierte un `Reporte` en su forma de JSON, y la conversión de `OptionalLong` a `Long` (`nulo`) es la que produce el `null` de los servicios sin respuesta. El constructor compacto con `List.copyOf` es la copia defensiva de la Lección 4; la Lección 10 muestra qué dice (y qué no dice) una herramienta de análisis sobre ella. La tercera pieza es `Formato`, que gana un método, `json`, y es el único cambio de un archivo cuyo resto ya conoces:
+El método `de` convierte un `Reporte` en su forma de JSON, y la conversión de `OptionalLong` a `Long` (`nulo`) es la que produce el `null` de los servicios sin respuesta. El campo `url` tampoco es `url().toString()`: es `sinSecretos(url)`, que arma la dirección de nuevo con esquema, servidor, puerto y ruta, y deja fuera usuario, clave, consulta (`?token=...`) y fragmento (`#...`). El JSON es un contrato con quien lo lea, así que el campo se queda y conserva su forma; lo que se quita es lo que ese lector no debe ver. Con `http://127.0.0.1:1/estado?token=SECRETO#x` en `servicios.json`, el JSON dice `"url" : "http://127.0.0.1:1/estado"`. El constructor compacto con `List.copyOf` es la copia defensiva de la Lección 4; la Lección 10 muestra qué dice (y qué no dice) una herramienta de análisis sobre ella. La tercera pieza es `Formato`, que gana un método, `json`, y es el único cambio de un archivo cuyo resto ya conoces:
 
 ```java
 // fig08_10/src/main/java/mx/habil/revisor/Formato.java

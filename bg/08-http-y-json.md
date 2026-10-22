@@ -992,8 +992,9 @@ final class Configuracion {
     URI url;
     try {
       url = new URI(campo.stringValue());
-    } catch (URISyntaxException e) {
-      throw new ErrorDeConfiguracion(prefijo + "'url' no es válida", e);
+    } catch (URISyntaxException _) {
+      // Sin la causa: su mensaje repite la dirección entera, con usuario, clave y token.
+      throw new ErrorDeConfiguracion(prefijo + "'url' no es válida");
     }
     String esquema = url.getScheme();
     if (!"http".equals(esquema) && !"https".equals(esquema)) {
@@ -1006,6 +1007,9 @@ final class Configuracion {
     if (!permitidos.contains(servidor)) {
       throw new ErrorDeConfiguracion(
           prefijo + "el servidor " + servidor + " no está en la lista permitida");
+    }
+    if (url.getRawUserInfo() != null) {
+      throw new ErrorDeConfiguracion(prefijo + "'url' no puede llevar usuario ni clave");
     }
     return url;
   }
@@ -1028,6 +1032,8 @@ final class Configuracion {
 
 Три решения заслужават коментар. **Първото: всяка повреда е `ErrorDeConfiguracion` със съобщение, което казва какво да се поправи и къде.** `servicio 2: falta 'nombre'` е съобщение, което човек може да използва; `NullPointerException` на ред 57 не е. Позицията (`servicio 2`) се брои от 1, както я брои човек. **Второто: грешките на Jackson се превеждат.** `JacksonException` е **непроверявано** изключение във версия 3 (една от разликите с 2), така че компилаторът не те задължава да го улавяш и затова е лесно да го забравиш и да оставиш един лошо написан файл да събори програмата със следа от стека. `catch` го превръща в `ErrorDeConfiguracion` и между другото се възползва от това, че изключението знае на кой ред и колона от файла се е счупило (`getLocation()`). **Третото: файлът се чете първо като текст с `Files.readString`**, с обработката на грешки от Урок 5 (`NoSuchFileException` става „no existe el archivo“, „файлът не съществува“), и едва тогава текстът се подава на Jackson. Всяка грешка има един-единствен произход и всяка се обработва на своето място.
 
+**Четвърто, за сигурността: `url` с потребител или парола се отхвърля при зареждане и никое съобщение не повтаря адреса.** `http://usuario:clave@127.0.0.1:1/estado` има схема `http`, има сървър и сървърът е в разрешения списък; но това, което стои преди кльомбата (`getRawUserInfo()`), е идентификационни данни и `revisor` би ги пренесъл във всичко, което пише. Затова се отхвърля с `'url' no puede llevar usuario ni clave`, съобщение, което не го повтаря, и затова `catch` за `URISyntaxException` вече не подава изключението като причина: съобщението му носи целия адрес, с всичко в него. Проверката идва след разрешения списък нарочно: `http://127.0.0.1@169.254.169.254/` продължава да се отхвърля заради сървъра си, както ще видиш в 8.8.3.
+
 Ето съобщенията, които произвежда. Позицията се брои от 1. Тестовете по-долу следят най-опасните; с останалите ще се занимаеш ти в упражнение 3:
 
 | Случай | Съобщение |
@@ -1041,6 +1047,7 @@ final class Configuracion {
 | url, който не е `http`/`https` | `servicio 2: 'url' debe empezar con http:// o https://` |
 | url без сървър или лошо написан | `servicio 2: 'url' no es válida` |
 | сървър извън разрешения списък | `servicio 2: el servidor 169.254.169.254 no está en la lista permitida` |
+| url с потребител или парола | `servicio 2: 'url' no puede llevar usuario ni clave` |
 | невалиден таймаут | `servicio 3: 'timeout_ms' debe ser un entero mayor que 0` |
 | повтарящи се имена | `nombres repetidos: catalogo` |
 
@@ -1255,6 +1262,7 @@ final class Json {
 
 package mx.habil.revisor;
 
+import java.net.URI;
 import java.util.List;
 import java.util.OptionalLong;
 
@@ -1279,7 +1287,7 @@ record ReporteJson(List<Fila> servicios, ResumenJson resumen) {
                 r ->
                     new Fila(
                         r.servicio().nombre(),
-                        r.servicio().url().toString(),
+                        sinSecretos(r.servicio().url()),
                         r.estado(),
                         nulo(r.tiempoMs()),
                         r.detalle()))
@@ -1295,13 +1303,23 @@ record ReporteJson(List<Fila> servicios, ResumenJson resumen) {
             nulo(resumen.promedioMs())));
   }
 
+  /**
+   * La dirección sin usuario, clave, consulta ni fragmento: solo esquema, servidor, puerto y
+   * ruta. El reporte lo lee quien lo pida, y una consulta puede traer un token.
+   */
+  static String sinSecretos(URI url) {
+    String puerto = url.getPort() == -1 ? "" : ":" + url.getPort();
+    String ruta = url.getRawPath() == null ? "" : url.getRawPath();
+    return url.getScheme() + "://" + url.getHost() + puerto + ruta;
+  }
+
   private static Long nulo(OptionalLong valor) {
     return valor.isPresent() ? valor.getAsLong() : null;
   }
 }
 ```
 
-Методът `de` превръща `Reporte` във формата му на JSON, а превръщането на `OptionalLong` в `Long` (`nulo`) е това, което произвежда `null` за услугите без отговор. Компактният конструктор с `List.copyOf` е защитното копие от Урок 4; Урок 10 показва какво казва (и какво не казва) един инструмент за анализ за него. Третата част е `Formato`, която получава един метод, `json`, и е единствената промяна във файл, чийто остатък вече познаваш:
+Методът `de` превръща `Reporte` във формата му на JSON, а превръщането на `OptionalLong` в `Long` (`nulo`) е това, което произвежда `null` за услугите без отговор. Полето `url` също не е `url().toString()`: то е `sinSecretos(url)`, което сглобява адреса наново със схема, сървър, порт и път и оставя навън потребител, парола, запитване (`?token=...`) и фрагмент (`#...`). JSON е договор с този, който го чете, затова полето остава и запазва формата си; маха се това, което този читател не бива да вижда. С `http://127.0.0.1:1/estado?token=SECRETO#x` в `servicios.json` JSON казва `"url" : "http://127.0.0.1:1/estado"`. Компактният конструктор с `List.copyOf` е защитното копие от Урок 4; Урок 10 показва какво казва (и какво не казва) един инструмент за анализ за него. Третата част е `Formato`, която получава един метод, `json`, и е единствената промяна във файл, чийто остатък вече познаваш:
 
 ```java
 // fig08_10/src/main/java/mx/habil/revisor/Formato.java

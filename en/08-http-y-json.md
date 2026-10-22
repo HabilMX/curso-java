@@ -990,8 +990,9 @@ final class Configuracion {
     URI url;
     try {
       url = new URI(campo.stringValue());
-    } catch (URISyntaxException e) {
-      throw new ErrorDeConfiguracion(prefijo + "'url' no es válida", e);
+    } catch (URISyntaxException _) {
+      // Sin la causa: su mensaje repite la dirección entera, con usuario, clave y token.
+      throw new ErrorDeConfiguracion(prefijo + "'url' no es válida");
     }
     String esquema = url.getScheme();
     if (!"http".equals(esquema) && !"https".equals(esquema)) {
@@ -1004,6 +1005,9 @@ final class Configuracion {
     if (!permitidos.contains(servidor)) {
       throw new ErrorDeConfiguracion(
           prefijo + "el servidor " + servidor + " no está en la lista permitida");
+    }
+    if (url.getRawUserInfo() != null) {
+      throw new ErrorDeConfiguracion(prefijo + "'url' no puede llevar usuario ni clave");
     }
     return url;
   }
@@ -1026,6 +1030,8 @@ final class Configuracion {
 
 Three decisions deserve a comment. **The first: every failure is an `ErrorDeConfiguracion` with a message that says what to fix and where.** `servicio 2: falta 'nombre'` (service 2: 'nombre' is missing) is a message a person can use; a `NullPointerException` on line 57 is not. The position (`servicio 2`) counts from 1, the way a person counts. **The second: Jackson's errors are translated.** `JacksonException` is an **unchecked** exception in version 3 (one of the differences from version 2), so the compiler does not force you to catch it, and that is why it is easy to forget it and let a badly written file bring the program down with a stack trace. The `catch` turns it into `ErrorDeConfiguracion`, and along the way takes advantage of the fact that the exception knows at which line and column of the file it broke (`getLocation()`). **The third: the file is first read into a string with `Files.readString`**, with the error handling from Lesson 5 (`NoSuchFileException` becomes “no existe el archivo” (the file does not exist)), and only then is the text handed to Jackson. Each error has a single origin, and each one is dealt with in its own place.
 
+**A fourth one, about security: a `url` with a user or password is rejected at load time, and no message repeats the address.** `http://usuario:clave@127.0.0.1:1/estado` has the `http` scheme, has a host, and the host is in the allowed list; but what comes before the at sign (`getRawUserInfo()`) is a credential, and the `revisor` would carry it into everything it writes. That is why it is rejected with `'url' no puede llevar usuario ni clave` ('url' cannot carry a user or password), a message that does not repeat it, and why the `catch` for `URISyntaxException` no longer passes the exception as the cause: its message carries the whole address, with whatever it holds. The check comes after the allowed list on purpose: `http://127.0.0.1@169.254.169.254/` is still rejected because of its host, as you will see in 8.8.3.
+
 These are the messages it produces. The position counts from 1. The tests further down watch over the most dangerous ones; the others you provoke yourself in exercise 3:
 
 | Case | Message |
@@ -1039,6 +1045,7 @@ These are the messages it produces. The position counts from 1. The tests furthe
 | url that is not `http`/`https` | `servicio 2: 'url' debe empezar con http:// o https://` (service 2: 'url' must start with http:// or https://) |
 | url without a host or badly written | `servicio 2: 'url' no es válida` (service 2: 'url' is not valid) |
 | host outside the allowed list | `servicio 2: el servidor 169.254.169.254 no está en la lista permitida` (service 2: the host 169.254.169.254 is not in the allowed list) |
+| url with a user or password | `servicio 2: 'url' no puede llevar usuario ni clave` (service 2: 'url' cannot carry a user or password) |
 | invalid timeout | `servicio 3: 'timeout_ms' debe ser un entero mayor que 0` (service 3: 'timeout_ms' must be an integer greater than 0) |
 | repeated names | `nombres repetidos: catalogo` (repeated names: catalogo) |
 
@@ -1253,6 +1260,7 @@ The second, `ReporteJson`, is the JSON's **shape**, deliberately kept separate f
 
 package mx.habil.revisor;
 
+import java.net.URI;
 import java.util.List;
 import java.util.OptionalLong;
 
@@ -1277,7 +1285,7 @@ record ReporteJson(List<Fila> servicios, ResumenJson resumen) {
                 r ->
                     new Fila(
                         r.servicio().nombre(),
-                        r.servicio().url().toString(),
+                        sinSecretos(r.servicio().url()),
                         r.estado(),
                         nulo(r.tiempoMs()),
                         r.detalle()))
@@ -1293,13 +1301,23 @@ record ReporteJson(List<Fila> servicios, ResumenJson resumen) {
             nulo(resumen.promedioMs())));
   }
 
+  /**
+   * La dirección sin usuario, clave, consulta ni fragmento: solo esquema, servidor, puerto y
+   * ruta. El reporte lo lee quien lo pida, y una consulta puede traer un token.
+   */
+  static String sinSecretos(URI url) {
+    String puerto = url.getPort() == -1 ? "" : ":" + url.getPort();
+    String ruta = url.getRawPath() == null ? "" : url.getRawPath();
+    return url.getScheme() + "://" + url.getHost() + puerto + ruta;
+  }
+
   private static Long nulo(OptionalLong valor) {
     return valor.isPresent() ? valor.getAsLong() : null;
   }
 }
 ```
 
-The `de` method converts a `Reporte` into its JSON shape, and the conversion from `OptionalLong` to `Long` (`nulo`) is what produces the `null` for the services without a response. The compact constructor with `List.copyOf` is the defensive copy from Lesson 4; Lesson 10 shows what an analysis tool says (and does not say) about it. The third piece is `Formato`, which gains one method, `json`, and is the only change in a file whose remainder you already know:
+The `de` method converts a `Reporte` into its JSON shape, and the conversion from `OptionalLong` to `Long` (`nulo`) is what produces the `null` for the services without a response. The `url` field is not `url().toString()` either: it is `sinSecretos(url)`, which rebuilds the address from scheme, host, port and path, and leaves out user, password, query (`?token=...`) and fragment (`#...`). The JSON is a contract with whoever reads it, so the field stays and keeps its shape; what is removed is what that reader must not see. With `http://127.0.0.1:1/estado?token=SECRETO#x` in `servicios.json`, the JSON says `"url" : "http://127.0.0.1:1/estado"`. The compact constructor with `List.copyOf` is the defensive copy from Lesson 4; Lesson 10 shows what an analysis tool says (and does not say) about it. The third piece is `Formato`, which gains one method, `json`, and is the only change in a file whose remainder you already know:
 
 ```java
 // fig08_10/src/main/java/mx/habil/revisor/Formato.java
