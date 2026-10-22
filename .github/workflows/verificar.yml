@@ -28,6 +28,9 @@ jobs:
           java --version
           mvn --version
 
+      - name: El medidor de profundidad sabe fallar (control positivo)
+        run: herramientas/autoprueba-medir-profundidad.sh
+
       - name: La profundidad se mide (piso de 3,000 palabras por lección, mediana de 4,000)
         run: herramientas/medir-profundidad.sh
 
