@@ -59,7 +59,7 @@ Le cours ne se termine pas quand tu as lu la leçon 10, mais quand ton `revisor`
 
 1. **`mvn -B verify` se termine au vert et le rapport dit combien de tests se sont exécutés.** Compte-les dans le rapport, pas dans le code de sortie : un vert avec zéro test ressemble à un vrai vert.
 2. **Il vérifie 20 services à la fois en un temps proche de celui du plus lent**, pas de la somme de tous. Tu le mesures toi-même, avec l'horloge, en série et en parallèle.
-3. **Un service tombé, lent ou qui répond n'importe quoi ne fait pas tomber le rapport :** il apparaît dans sa ligne avec son erreur, et le reste sort complet et dans le même ordre que toujours.
+3. **Un service en panne, lent ou qui répond n'importe quoi ne fait pas tomber le rapport :** il apparaît dans sa ligne avec son erreur, et le reste sort complet et dans le même ordre que toujours.
 4. **Aucune requête ne peut attendre indéfiniment :** toutes ont un délai de connexion et un délai maximal.
 5. **Il rejette les adresses qui ne sont pas `http` ou `https` et celles qui ne figurent pas dans la liste autorisée**, au lieu de consulter ce qu'on lui écrit dans le fichier.
 6. **Il s'exécute avec `java -jar revisor.jar` depuis un autre dossier et sort avec le code 0 si tout est en ligne et 1 sinon.**
